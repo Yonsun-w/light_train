@@ -1,0 +1,17 @@
+WRFFileDir=/data/wenjiahua/ADSNet_testdata/WRFFile/
+TruthFileDir=/data/wenjiahua/ADSNet_testdata/lightningFile/
+TruthFileDirGrid=/data/wenjiahua/ADSNet_testdata/lightningFileGrid/
+VisResultFileDir=none
+ModelFileDir=/data/wenjiahua/ADSNet_testdata/Models/
+RecordFileDir=/data/wenjiahua/ADSNet_testdata/Records/
+GridRowColNum=159
+ForecastHourNum=12
+TruthHistoryHourNum=3
+WRFChannelNum=83
+ScanStartTime=202203132339
+ScanEndTime=202203132339
+NetName=ADSNet
+Batchsize=4
+LearningRate=0.0001
+EpochNum=30
+Device=cuda
