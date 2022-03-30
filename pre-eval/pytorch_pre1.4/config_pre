@@ -17,3 +17,4 @@ WRFChannelNum=29
 ForecastHourNum=12
 TruthHistoryHourNum=3
 Device=cuda
+test
