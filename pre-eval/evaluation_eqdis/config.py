@@ -10,7 +10,11 @@ def read_config():
             key = item[0]
             if key == 'FilePath':
                 config_info[key] = item[1]
-            elif key == 'PreFilePath':
+            elif key == 'preFile':
+                config_info[key] = item[1]
+            elif key == 'TrueFileGrid':
+                config_info[key] = item[1]
+            elif key == 'preEqualDistance':
                 config_info[key] = item[1]
             elif key == 'ObsFilePath':
                 config_info[key] = item[1]
