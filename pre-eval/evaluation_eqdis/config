@@ -1,7 +1,7 @@
-FilePath=/home/wenjiahua/lightning/evaluation_eqdis/input_examples
-TrueFileGrid=/home/wenjiahua/lightning/evaluation_eqdis/input_examples/obs
-preFile=/home/wenjiahua/lightning/evaluation_eqdis/input_examples/pre
-preEqualDistance=/home/wenjiahua/lightning/evaluation_eqdis/input_examples/pre_dis
+FilePath=/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples
+TrueFileGrid=/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/obs
+preFile=/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/pre
+preEqualDistance=/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/pre_dis
 StartTime=202005211000
 EndTime=202005211000
 Threshold=0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9

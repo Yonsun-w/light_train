@@ -85,20 +85,26 @@ class LightingToGird(object):
 class Dataloader(object):
     def __init__(self, config_dict):
         self.config_dict = config_dict
+
         self.light_grid_generator = LightingToGird(config_dict)
+
         self.is_wrffile_exist, self.is_obsfile_exist, self.WRFFileName, self.WRFFileDeltaHour = self._checkData()
 
     def _checkData(self):
-        config_dict = self.config_dict
-        ddt = datetime.datetime.strptime(config_dict['Datetime'], '%Y%m%d%H%M')
+        ##首先获取日期
+        ddt = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M')
+        ##将日期向后推8小时转换为世界时？ 再推6小时(貌似是为了增加鲁棒性) 得到wrf的时间
         wrf_time = ddt + datetime.timedelta(hours=-8) + datetime.timedelta(hours=(-6))
+        ##_getTimePeriod这里貌似链接上一步 也是增加鲁棒性
         wrf_time_hour, delta_hour = self._getTimePeriod(wrf_time)
+        ## delta_hour是推迟的时间？
         delta_hour += 6
-        nc_filename = config_dict['WRFFileDir'] + wrf_time.strftime("%Y-%m-%d") + '_' + wrf_time_hour + '.wrfvar.nc'
 
+        ## 获取nc文件路径
+        nc_filename = self.config_dict['WRFFileDir'] + wrf_time.strftime("%Y-%m-%d") + '_' + wrf_time_hour + '.wrfvar.nc'
         wrf_time2 = wrf_time + datetime.timedelta(hours=(-6))
         wrf_time_hour2, delta_hour2 = self._getTimePeriod(wrf_time2)
-        nc_filename2 = config_dict['WRFFileDir'] + wrf_time2.strftime("%Y-%m-%d") + '_' + wrf_time_hour2 + '.wrfvar.nc'
+        nc_filename2 = self.config_dict['WRFFileDir'] + wrf_time2.strftime("%Y-%m-%d") + '_' + wrf_time_hour2 + '.wrfvar.nc'
         if os.path.exists(nc_filename):
             print('WRF file exist! (input file:{})'.format(nc_filename))
             is_wrffile_exist = True

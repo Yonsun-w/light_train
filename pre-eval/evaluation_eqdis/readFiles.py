@@ -15,7 +15,7 @@ from scores import Cal_params_neighbor
 
 
 class EvalData(object):
-    def __init__(self, path, time, pre_timelimit, time_step, threshold=0.5):
+    def __init__(self, true_file_grid, pre_file, pre_equal_distance, time, pre_timelimit, time_step, threshold=0.5):
         self.threshold = threshold
 
         # #
@@ -33,16 +33,19 @@ class EvalData(object):
         # #
 
         time = datetime.datetime.strptime(time, '%Y%m%d%H%M')
+
         time += datetime.timedelta(minutes=pre_timelimit[0])
         self.pre_data = np.zeros([159, 159])
         self.obs_data = np.zeros([149, 201])
         self.pre_data_dis = np.zeros([159, 159])
         for i in range(pre_timelimit[0] // time_step, pre_timelimit[1] // time_step):
-            pre_path = os.path.join(path, 'pre', '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
-            # obs_path = os.path.join(path, 'obs', 'RealDF{}_60.npy'.format(time.strftime('%Y%m%d%H%M')))
-            obs_path = os.path.join(path, 'obs', 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
-            pre_dis_path = os.path.join(path, 'pre_dis', '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
-            # self.pre_data += self._loadPreData_timestep(pre_path)
+
+            pre_path = os.path.join(pre_file, '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
+
+            obs_path = os.path.join(true_file_grid, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
+            pre_dis_path = os.path.join(pre_equal_distance, '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
+            # self.pre_data += self._loadPreData_timestep(pre_path) ## 这里为什么注解掉了？
+
             self.obs_data += self._loadObsData_timestep(obs_path)
             self.pre_data_dis += self._loadPredis_Data_timestep(pre_dis_path)
             time += datetime.timedelta(minutes=time_step)
@@ -97,7 +100,6 @@ class EvalData(object):
         return obs
 
     def _disResize(self, img):
-        
         dst = cv.resize(img, (159, 159))
         obs = np.array(dst)
         obs[obs >= 0.5] = 1
@@ -120,16 +122,24 @@ def show(img):
 
 if __name__ == "__main__":
     # loadPreData()
-    path = 'home/wrfelec05/zhou/evaluation_eqdis/input_examples'
+    path_obs = '/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/obs'
+    path_pre = '/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/pre'
+
+    path_dis = '/Users/yonsun/gitTest/light_train/pre-eval/evaluation_eqdis/input_examples/pre_dis'
+
     # path = '/home/pengqingjie/Pytorch/LightNet_AMS/evaluation_eqdis/input_examples'
     # time = '202005201800'
-    time = '202007101500'
-    # 这里为什么只传入了一个参数 虽然是测试吧
-    p = EvalData(path, time)
+    time = '202005211000'
+    # # # 这里后边的几个参数不传 无法运行 但是原始的也没传入呀
+    ptl = (0, 360)
+    time_step = 60
+    threshold = 0.1
+    p = EvalData(path_obs, path_pre, path_dis, time, ptl, time_step, threshold)
     for i in range(5):
         cal = Cal_params_neighbor(neighbor_size=i)
         t = cal.cal_params_ones(p.obs_data, p.pre_data)
         print(t['FSS'], t['ETS'], t['N1'], t['N2'], t['N3'], t['N4'], t['N1'] + t['N2'] + t['N3'] + t['N4'])
+
     # def loadPreData(path):
     #     pre = []
     #     with open(path, 'rb') as f:
