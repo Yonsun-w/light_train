@@ -44,7 +44,7 @@ class EvalData(object):
 
             obs_path = os.path.join(true_file_grid, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
             pre_dis_path = os.path.join(pre_equal_distance, '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
-            # self.pre_data += self._loadPreData_timestep(pre_path) ## 这里为什么注解掉了？
+            # self.pre_data += self._loadPreData_timestep(pre_path) #todo 这里为什么注解掉了？
 
             self.obs_data += self._loadObsData_timestep(obs_path)
             self.pre_data_dis += self._loadPredis_Data_timestep(pre_dis_path)
