@@ -4,27 +4,27 @@ import pandas as pd
 from config import read_config
 from readFiles import EvalData
 from scores import Cal_params_neighbor
-#from pandas import datetime
+# from pandas import datetime
 import datetime
 
 
-def checkData(time, path, pre_duration, time_step):
+def checkData(time, true_file_grid, pre_file, pre_equal_distance, pre_duration, time_step):
     is_predata = True
     is_obsdata = True
     is_predis_data = True
     for i in range(0, pre_duration // time_step):
-        pre_path = os.path.join(path, 'pre', '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
+        pre_path = os.path.join(pre_file, '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
         if not os.path.exists(pre_path):
+            print("not exits pre_path = ", pre_path)
             is_predata = False
-        predis_path = os.path.join(path, 'pre_dis', '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
+        predis_path = os.path.join(pre_equal_distance, '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
         if not os.path.exists(predis_path):
-
             is_predis_data = False
-        obs_path = os.path.join(path, 'obs', 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
+        obs_path = os.path.join(true_file_grid, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
         if not os.path.exists(obs_path):
             is_obsdata = False
         time += datetime.timedelta(minutes=time_step)
-    print(is_predata,is_predis_data,is_obsdata)
+    print(is_predata, is_predis_data, is_obsdata)
     return is_predata and is_obsdata and is_predis_data
 
 
@@ -34,20 +34,28 @@ def main(config_dict):
     path = config_dict['FilePath']
     pre_duration = config_dict['PreDuration']
     time_step = config_dict['TimeStep']
-
+    true_file_grid = config_dict['TrueFileGrid']
+    pre_file = config_dict['preFile']
+    pre_equal_distance = config_dict['preEqualDistance']
     st = datetime.datetime.strptime(config_dict['StartTime'], '%Y%m%d%H%M')
     et = datetime.datetime.strptime(config_dict['EndTime'], '%Y%m%d%H%M')
     all_available_time = []
     while st <= et:
-        if checkData(st, path, pre_duration, time_step):
+        # if checkData(st, path, pre_duration, time_step):
+        if checkData(st, true_file_grid, pre_file, pre_equal_distance, pre_duration, time_step):
             all_available_time.append(st.strftime('%Y%m%d%H%M'))
         else:
             print('{} data is not complete.'.format(st.strftime('%Y%m%d%H%M')))
         st += datetime.timedelta(hours=1)
 
+    eval_results.to_csv('result.csv', header=True, index=False)
+    print("ok");
+
     for time in all_available_time:
         print(datetime.datetime.strptime(time, '%Y%m%d%H%M'))
         for ptl in config_dict['PreTimeLimit']:
+            print("enter,and ptl = ", ptl)
+            print("config_dict['Threshold']", config_dict['Threshold'])
             for threshold in config_dict['Threshold']:
                 p = EvalData(path, time, ptl, time_step, threshold)
                 for nbh in config_dict['NeighborhoodRange']:
@@ -64,7 +72,11 @@ def main(config_dict):
                         # print(name, scores[name])
                         results_dict[name] = scores[name]
                     eval_results = eval_results.append(results_dict, ignore_index=True)
-    eval_results.to_csv('result.csv', index=False)
+                    # wjh 改 将结果实时输出 MODE = 'a' 是追加的意思
+                eval_results.to_csv('result.csv', mode='a', header=False, index=False)
+        print('所有数据已输入进result.csvs，请查看')
+    # wjh 改 将结果实时输出
+    # eval_results.to_csv('result.csv', index=False)
 
 
 if __name__ == "__main__":
