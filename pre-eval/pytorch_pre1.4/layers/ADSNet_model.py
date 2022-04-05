@@ -73,6 +73,8 @@ class ADSNet_Model(nn.Module):
 
     def forward(self, wrf, obs):
         # batch normalization
+
+        # permute是将wrf的纬度换位
         wrf = wrf.permute(0, 4, 1, 2, 3)
         wrf = self.wrf_batchnorm(wrf)
         wrf = wrf.permute(0, 2, 3, 4, 1)
@@ -83,23 +85,30 @@ class ADSNet_Model(nn.Module):
         wrf = wrf.permute(1, 0, 4, 2, 3).contiguous()
 
         batch_size = obs.shape[1]
+
         pre_frames = torch.zeros([self.wrf_tra_frames, batch_size, 1, wrf.shape[3], wrf.shape[4]]).to(wrf.device)
 
         h = torch.zeros([batch_size, 8, (self.config_dict['GridRowColNum']//2)//2, (self.config_dict['GridRowColNum']//2)//2], dtype=torch.float32).to(obs.device)
+
         c = torch.zeros([batch_size, 8, (self.config_dict['GridRowColNum']//2)//2, (self.config_dict['GridRowColNum']//2)//2], dtype=torch.float32).to(obs.device)
         for t in range(self.obs_tra_frames):
             obs_encoder = self.CNN_module1(obs[t])
+            # 编码 encoder
             h, c = self.encoder_ConvLSTM(obs_encoder, h, c)
+
         h = self.encoder_h(h)
+
         c = self.encoder_c(c)
+
         for t in range(self.wrf_tra_frames):
+            # 获得注意力
             wrf_att = self.attention(wrf[t], h, c)
             wrf_encoder = self.CNN_module2(wrf_att)
             h, c = self.decoder_ConvLSTM(wrf_encoder, h, c)
             pre = self.CNN_module3(h)
             pre_frames[t] = pre
         pre_frames = pre_frames.permute(1, 0, 3, 4, 2).contiguous()
-        # print(pre_frames.shape)
+
         return pre_frames
 
 if __name__ == "__main__":

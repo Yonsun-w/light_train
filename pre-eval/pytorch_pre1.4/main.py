@@ -79,15 +79,20 @@ def selectModel(is_wrffile_exist, is_obsfile_exist, config_dict):
     return model
 
 def DoPredict(config_dict):
+    # 加载数据
     data = Dataloader(config_dict)
+    # 查看wrf和obs文件是否完整
     is_wrffile_exist, is_obsfile_exist = data.getDataStates()
+    # 选择模型
     model = selectModel(is_wrffile_exist, is_obsfile_exist, config_dict)
     if model == None:
         print('error: model file or data not found!')
         return
 
     wrf, obs = data.getData()
+
     pre_frames = model(wrf, obs)
+    # 这里sigmoid一下
     pre_frames = torch.sigmoid(pre_frames)
     if config_dict['Threshold'] < 0:
         # probability output
@@ -97,18 +102,18 @@ def DoPredict(config_dict):
         pre_frames[pre_frames < 1] = 0
     WriteINIFile(is_obsfile_exist, is_wrffile_exist, data.WRFFileName, config_dict)
     print('Successfully writing information to INI file!')
-
     output_file_writer = Writefile(config_dict)
+
+    # 按小时来写入结果
     for hour_plus in range(config_dict['ForecastHourNum']):
         output_file_writer.writeResultFile(pre_frames[0, hour_plus, :, :, 0], hour_plus)
 
 
 
 if __name__ == "__main__":
-    #Read in the configuration file and allocate GPU
+    # Read in the configuration file and allocate GPU
     os.environ['CUDA_VISIBLE_DEVICES'] = '1,2'
     config_dict = read_config()
-
     if not os.path.isdir(config_dict['IniFileDir']):
         os.makedirs(config_dict['IniFileDir'])
     if not os.path.isdir(config_dict['ResultSavePath']):
