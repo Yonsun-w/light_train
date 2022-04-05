@@ -124,6 +124,7 @@ if __name__ == "__main__":
     # path = '/home/pengqingjie/Pytorch/LightNet_AMS/evaluation_eqdis/input_examples'
     # time = '202005201800'
     time = '202007101500'
+    # 这里为什么只传入了一个参数 虽然是测试吧
     p = EvalData(path, time)
     for i in range(5):
         cal = Cal_params_neighbor(neighbor_size=i)
