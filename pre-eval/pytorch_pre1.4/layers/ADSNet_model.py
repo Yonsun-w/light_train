@@ -77,11 +77,13 @@ class ADSNet_Model(nn.Module):
         # permute是将wrf的纬度换位
         wrf = wrf.permute(0, 4, 1, 2, 3)
         wrf = self.wrf_batchnorm(wrf)
+
         wrf = wrf.permute(0, 2, 3, 4, 1)
 
         # obs : [batch_size, frames, x, y, channels] -> [frames, batch_size, channels, x, y]
         obs = obs.permute(1, 0, 4, 2, 3).contiguous()
         # wrf : [batch_size, frames, x, y, channels] -> [frames, batch_size, channels, x, y]
+
         wrf = wrf.permute(1, 0, 4, 2, 3).contiguous()
 
         batch_size = obs.shape[1]

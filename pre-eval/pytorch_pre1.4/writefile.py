@@ -130,12 +130,16 @@ class Writefile(object):
                     grid[int(self.grid_transformer_near4[i, j, 0, 1]), int(self.grid_transformer_near4[i, j, 1, 1])] = pre_grid[i, j]
 
         grid = np.flip(grid, axis=0)
-        #test
+        # dt_d 是这种格式 datetime.datetime(2020, 6, 10, 16, 50)
         dt_d = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=hour_plus)
-        # todo 所以怎么保存为wrf文件 这不是一个矩阵吗  pre_grid.cpu().detach().numpy()
-        # grid【1，1】 = 1
+
+        # 'ResultDistanceSavePath' 和 'EvalutionDistanceSavePath'
+        # 对应评估下的pre_dis文件夹 ResultDistanceSavePath 对应pre_dis下的 Equal_Distance
         np.save(os.path.join(self.config_dict['ResultDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
+
         np.save(os.path.join(self.config_dict['EvalutionDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
+
+
         # np.savetxt(self.config_dict['ResultDistanceSavePath']+'grid.txt',grid,delimiter='\t')
         # with open(self.config_dict['ResultDistanceSavePath']+'grid_test.txt', 'wb') as file:
         #     for i in range(row*col):

@@ -38,6 +38,7 @@ def createNc():
 
     f_w.close()
 
+
 def readNc():
     npc_path = 'wjhTest.nc'
     f = nc.Dataset(npc_path)
