@@ -6,17 +6,18 @@ import netCDF4 as nc
 if __name__ == "__main__":
     pwd = os.getcwd()
 
-    npc_path = 'BJ.latlon.nc'
+    npc_path = 'example.nc'
 
-    f = nc.Dataset(npc_path)
+    test_path = 'Equal_distance.nc'
 
+    f = nc.Dataset('Equal_distance.nc', 'r+', format='NETCDF4')  # 创建一个格式为.nc的
+    print(f)
+    f.close()
 
-
-    all_vars = f.variables.keys()  # 获取所有变量名称  这里获取的是 odict_keys(['lat', 'lon'])
-
-    all_vars_info = f.variables.items()  # 获取所有变量的属性 一大串
-
-    print(all_vars_info)
+    # print("-------")
+    #
+    # f = nc.Dataset(npc_path)
+    # print(f)
     #
     # print(var_data.shape)
     #
