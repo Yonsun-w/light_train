@@ -6,8 +6,8 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/wrfTest/*
 *.dat
 *.DAT
 *.npy
 *.nc
-/wrfTest/*
