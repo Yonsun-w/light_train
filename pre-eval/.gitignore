@@ -10,3 +10,4 @@
 *.DAT
 *.npy
 *.nc
+*.wrfvar.nc
