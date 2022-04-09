@@ -10,4 +10,4 @@
 *.DAT
 *.npy
 *.nc
-*.wrfvar.nc
+/wrfTest/*
