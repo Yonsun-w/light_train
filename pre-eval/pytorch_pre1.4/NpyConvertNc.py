@@ -43,7 +43,6 @@ def createDistanceNc(config_dict, ncPath ='test.nc'):
     end_time = datetime.datetime.strptime(config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=config_dict['ForecastHourNum'])
 
 
-
     f_w.variables['Flash_pre'].init_time = start_time.strftime('%Y%m%d') + '_' + start_time.strftime('%H%M%S')
 
     f_w.variables['Flash_pre'].valid_time = end_time.strftime('%Y%m%d') + '_' + end_time.strftime('%H%M%S')

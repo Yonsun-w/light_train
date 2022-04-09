@@ -112,11 +112,13 @@ class Writefile(object):
         # test
         # light_grid_generator = LightingToGird(self.config_dict)
         # light_grid_generator.getPeroid1HourGridFromFile(pre_grid, hour_plus)
+        # todo 什么意思
         row = self.writeinfo_dict['nGridDataYNum']
         col = self.writeinfo_dict['nGridDataXNum']
         grid = -np.ones((row, col))
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):
+                # todo 啥意思 为啥初始为-1 grid_transformer_near4
                 grid[int(self.grid_transformer_near4[i, j, 0, 0]), int(self.grid_transformer_near4[i, j, 1, 0])] = pre_grid[i, j]
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):
@@ -128,14 +130,11 @@ class Writefile(object):
                     grid[int(self.grid_transformer_near4[i, j, 0, 1]), int(self.grid_transformer_near4[i, j, 1, 1])] = pre_grid[i, j]
 
         grid = np.flip(grid, axis=0)
-        # dt_d 是这种格式 datetime.datetime(2020, 6, 10, 16, 50)
+        #test
         dt_d = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=hour_plus)
-
-        # 'ResultDistanceSavePath' 和 'EvalutionDistanceSavePath'
-        # 对应评估下的pre_dis文件夹 ResultDistanceSavePath 对应pre_dis下的 Equal_Distance
+        # todo 所以怎么保存为wrf文件 这不是一个矩阵吗  pre_grid.cpu().detach().numpy()
+        # grid【1，1】 = 1
         np.save(os.path.join(self.config_dict['ResultDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
-
-        np.save(os.path.join(self.config_dict['EvalutionDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
 
 
         # np.savetxt(self.config_dict['ResultDistanceSavePath']+'grid.txt',grid,delimiter='\t')
