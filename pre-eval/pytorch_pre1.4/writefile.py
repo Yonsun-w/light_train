@@ -135,7 +135,6 @@ class Writefile(object):
         # todo 所以怎么保存为wrf文件 这不是一个矩阵吗  pre_grid.cpu().detach().numpy()
         # grid【1，1】 = 1
         np.save(os.path.join(self.config_dict['ResultDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
-        np.save(os.path.join(self.config_dict['EvalutionDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
         # np.savetxt(self.config_dict['ResultDistanceSavePath']+'grid.txt',grid,delimiter='\t')
         # with open(self.config_dict['ResultDistanceSavePath']+'grid_test.txt', 'wb') as file:
         #     for i in range(row*col):

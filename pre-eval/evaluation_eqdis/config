@@ -10,3 +10,7 @@ PreDuration=720
 PreTimeLimit=0/720,0/360,360/720
 NeighborhoodRange=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 EvaluationMethod=N1,N2,N3,N4,POD,BIAS,FAR,FOM,TS,ETS,PC,FSS
+lonBegin=1
+lonEnd=2
+latBegin=3
+latEnd=4

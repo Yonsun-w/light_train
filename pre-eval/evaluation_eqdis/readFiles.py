@@ -17,7 +17,6 @@ from scores import Cal_params_neighbor
 class EvalData(object):
     def __init__(self, true_file_grid, pre_file, pre_equal_distance, time, pre_timelimit, time_step, threshold=0.5):
         self.threshold = threshold
-
         # #
         # with open(os.path.join(path, 'pre', '{}_h0.dat'.format(time)), 'rb') as f:
         #     data = f.read()
@@ -31,7 +30,7 @@ class EvalData(object):
         #     self.y = struct.unpack('i', data[44:48])[0]
         # # print(self.lon_left, self.lat_top, self.lon_center, self.lat_center, self.lon_step, self.lat_step, self.x, self.y)
         # #
-
+        
         time = datetime.datetime.strptime(time, '%Y%m%d%H%M')
 
         time += datetime.timedelta(minutes=pre_timelimit[0])
