@@ -112,13 +112,11 @@ class Writefile(object):
         # test
         # light_grid_generator = LightingToGird(self.config_dict)
         # light_grid_generator.getPeroid1HourGridFromFile(pre_grid, hour_plus)
-        # todo 什么意思
         row = self.writeinfo_dict['nGridDataYNum']
         col = self.writeinfo_dict['nGridDataXNum']
         grid = -np.ones((row, col))
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):
-                # todo 啥意思 为啥初始为-1 grid_transformer_near4
                 grid[int(self.grid_transformer_near4[i, j, 0, 0]), int(self.grid_transformer_near4[i, j, 1, 0])] = pre_grid[i, j]
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):

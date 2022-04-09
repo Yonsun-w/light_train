@@ -38,9 +38,9 @@ def createDistanceNc(config_dict, ncPath ='test.nc'):
     f_w.variables['Flash_pre'].coordinates = 'XLONG XLAT'
 
     # 获取开始时间
-    start_time = datetime.datetime.strptime(config_dict['Datetime'],'%Y%m%d%H%M')
+    start_time = datetime.datetime.strptime(config_dict['Datetime'], '%Y%m%d%H%M')
     # 获取结束时间
-    end_time = datetime.datetime.strptime(config_dict['Datetime'],'%Y%m%d%H%M') + datetime.timedelta(hours=config_dict['ForecastHourNum'])
+    end_time = datetime.datetime.strptime(config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=config_dict['ForecastHourNum'])
 
 
 
