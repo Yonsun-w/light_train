@@ -47,7 +47,6 @@ def readNpy():
 
 
 if __name__ == '__main__':
-    readNpy()
-
+    readNpy() 
 
 
