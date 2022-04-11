@@ -8,6 +8,7 @@ from config import read_config
 # from generator import DataGenerator, DataGeneratorOnlyObs, DataGeneratorOnlyWRF
 from generator import Dataloader
 from writefile import Writefile
+from NpyConvertNc import createDistanceNc
 # from newnc_generator import DataGenerator
 from layers.ADSNet_model import ADSNet_Model
 from layers.LightNet_model import LightNet_Model
@@ -91,6 +92,7 @@ def DoPredict(config_dict):
 
     wrf, obs = data.getData()
 
+
     pre_frames = model(wrf, obs)
     # 这里sigmoid一下
     pre_frames = torch.sigmoid(pre_frames)
@@ -103,10 +105,16 @@ def DoPredict(config_dict):
     WriteINIFile(is_obsfile_exist, is_wrffile_exist, data.WRFFileName, config_dict)
     print('Successfully writing information to INI file!')
     output_file_writer = Writefile(config_dict)
+    lon_min, lon_max, lat_min, lat_max = output_file_writer.getEdge()
 
     # 按小时来写入结果
     for hour_plus in range(config_dict['ForecastHourNum']):
         output_file_writer.writeResultFile(pre_frames[0, hour_plus, :, :, 0], hour_plus)
+
+    # 写入等距离
+    createDistanceNc(config_dict, lon_min, lon_max, lat_min, lat_max)
+
+    #
 
 
 

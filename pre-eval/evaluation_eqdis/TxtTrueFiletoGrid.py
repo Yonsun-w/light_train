@@ -87,8 +87,6 @@ class TxtTrueFiletoGrid(object):
 
         if lo < self.lon_min or lo > self.lon_max or la < self.lat_min or la > self.lat_max or datetime < self.start_time or datetime > self.end_time:
             return -1
-
-        # 这是什么意思
         d = self._cal_distance(la, lo, self.latlon[:, 0], self.latlon[:, 1])
         if np.min(d) > self.sin_distance * np.sqrt(2):
             return -1
