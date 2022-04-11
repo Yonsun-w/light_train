@@ -1,14 +1,10 @@
-from typing import Union, Iterable
-
 import numpy as np
 import datetime
 import os
 #from netCDF4 import Dataset
 import struct
 import cv2 as cv
-from ConvertToGird import LightingToGird
-from numpy import ndarray
-from skimage import transform
+
 np.set_printoptions(threshold=np.inf)
 
 from scores import Cal_params_neighbor

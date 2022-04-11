@@ -8,8 +8,7 @@ import os
 # path传入的是npy文件的路径
 def createDistanceNc(config_dict, ncPath ='test.nc'):
     f_w = nc.Dataset('Equal_distance.nc', 'w', format='NETCDF4')  # 创建一个格式为.nc的
-
-    f_w.FileOrigins = 'equidistant/equal lat&lon'
+    f_w.FileOrigins = 'equidistant'
     f_w.lon_begin = 'XX'
     f_w.lon_end = 'XX'
     f_w.lat_begin = 'XX'

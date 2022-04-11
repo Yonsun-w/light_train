@@ -23,7 +23,15 @@ def readNc():
 
 
 if __name__ == '__main__':
-    readNc()
+    path = 'test.txt'
+
+    f = open(path, 'r+', encoding='UTF-8')
+
+    for line in f:
+        line = 'test'
+        print(line)
+
+    f.close()
 
 
 
