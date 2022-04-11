@@ -5,15 +5,15 @@ import datetime
 import os
 
 
-# path传入的是npy文件的路径
-def createDistanceNc(config_dict, ncPath ='test.nc'):
+# path传入的是npy文件的路径 写入等经纬度
+def createDistanceNc(config_dict, lon_min, lon_max, lat_min, lat_max, ncPath ='ResultDistance.nc'):
     f_w = nc.Dataset('Equal_distance.nc', 'w', format='NETCDF4')  # 创建一个格式为.nc的
 
-    f_w.FileOrigins = 'equidistant/equal lat&lon'
-    f_w.lon_begin = 'XX'
-    f_w.lon_end = 'XX'
-    f_w.lat_begin = 'XX'
-    f_w.lat_end = 'XX'
+    f_w.FileOrigins = 'equidistant'
+    f_w.lon_begin = lon_min
+    f_w.lon_end = lon_max
+    f_w.lat_begin = lat_min
+    f_w.lat_end = lat_max
     f_w.delta_lat = 0.03
     f_w.delta_dis ='4km'
     f_w.delta_time = '1 hour'

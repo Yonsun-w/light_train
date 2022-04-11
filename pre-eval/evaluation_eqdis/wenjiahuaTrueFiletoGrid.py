@@ -112,7 +112,7 @@ if __name__ == "__main__":
             temp_date = linedata[1]
             temp_time = linedata[2]
             temp_dt = datetime.datetime.strptime(temp_date + ' ' + temp_time[0:8], "%Y-%m-%d %H:%M:%S")
-            lightning_data['data'] = temp_dt.strptime("%Y%m%d%H%M%S")
+            lightning_data['data'] = temp_dt.strftime("%Y%m%d%H%M%S")
             lightning_data['lat'] = linedata[3].lstrip('纬度=')
             lightning_data['lon'] = linedata[4].lstrip('经度=')
             print(lightning_data)

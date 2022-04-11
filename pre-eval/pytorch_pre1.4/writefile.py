@@ -8,7 +8,9 @@ class Writefile(object):
     def __init__(self, config_dict):
         self.config_dict = config_dict
         mn = config_dict['GridRowColNum']
+
         latlon_nc = Dataset(config_dict['LatlonFilePath'])
+
         lat_ = latlon_nc.variables['lat'][:, :]
         lon_ = latlon_nc.variables['lon'][:, :]
         latlon_nc.close()
@@ -39,10 +41,13 @@ class Writefile(object):
         self.writeinfo_dict['nGridDataXNum'] = col
         self.writeinfo_dict['nGridDataYNum'] = row
         #
-        for key,value in self.writeinfo_dict.items():
+        for key, value in self.writeinfo_dict.items():
             print(key+'\t:'+str(value))
         #
 
+    # 获取经纬度边界
+    def getEdge(self):
+        return self.lon_min, self.lon_max, self.lat_min, self.lat_max
 
     # get every grid point (equal-distance grid) nearest 4 points in equal-latlon grid
     def _getLatlonTransformer(self, gap_x, gap_y):
@@ -109,16 +114,11 @@ class Writefile(object):
 
     def writeResultFile(self, pre_grid, hour_plus):
 
-        # test
-        # light_grid_generator = LightingToGird(self.config_dict)
-        # light_grid_generator.getPeroid1HourGridFromFile(pre_grid, hour_plus)
-        # todo 什么意思
         row = self.writeinfo_dict['nGridDataYNum']
         col = self.writeinfo_dict['nGridDataXNum']
         grid = -np.ones((row, col))
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):
-                # todo 啥意思 为啥初始为-1 grid_transformer_near4
                 grid[int(self.grid_transformer_near4[i, j, 0, 0]), int(self.grid_transformer_near4[i, j, 1, 0])] = pre_grid[i, j]
         for i in range(self.config_dict['GridRowColNum']):
             for j in range(self.config_dict['GridRowColNum']):
@@ -132,7 +132,6 @@ class Writefile(object):
         grid = np.flip(grid, axis=0)
         #test
         dt_d = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=hour_plus)
-        # todo 所以怎么保存为wrf文件 这不是一个矩阵吗  pre_grid.cpu().detach().numpy()
         # grid【1，1】 = 1
         np.save(os.path.join(self.config_dict['ResultDistanceSavePath'], '{}_h{}.npy'.format(dt_d.strftime('%Y%m%d%H%M'), hour_plus)), pre_grid.cpu().detach().numpy())
 
