@@ -5,24 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edb8f6b7-312a-4833-b472-dd6bd76cd294" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pre-eval/wjhTest/test.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/light_train.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/light_train.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pre-eval/DataLattice/config" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pre-eval/DataLattice/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pre-eval/DataLattice/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/ConvertToGird.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/TxtTrueFiletoGrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/DataLattice/TxtTrueFiletoGrid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/config" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/readFiles.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/readFiles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/real.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/real.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/wenjiahuaTrueFiletoGrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/TxtTrueFiletoGrid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_pre1.4/NpyConvertNc.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_pre1.4/NpyConvertNc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/wjhTest/npyTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/wjhTest/npyTest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/~$离预报产品评估部分要求-20220317.docx" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/~$离预报产品评估部分要求-20220317.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/real.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/DataLattice/TruthFileDir/2020_07_10.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -36,17 +38,21 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pre-eval/DataLattice" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Desktop\时空序列学习\light\light_train\pre-eval\DataLattice" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Desktop\时空序列学习\light\light_train\pre-eval\DataLattice\TruthFileDir" />
       <recent name="C:\Users\Administrator\Desktop\时空序列学习\light\light_train\pre-eval\pytorch_pre1.4" />
       <recent name="C:\Users\Administrator\Desktop\时空序列学习\light\light_train\pre-eval\evaluation_eqdis" />
       <recent name="C:\Users\Administrator\Desktop\时空序列学习\light\light_train\pre-eval\wjhTest" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.TxtTrueFiletoGrid (1)">
+  <component name="RunManager" selected="Python.TxtTrueFiletoGrid (2)">
     <configuration name="TxtTrueFiletoGrid (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="light_train" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -60,6 +66,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pre-eval/evaluation_eqdis/TxtTrueFiletoGrid.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TxtTrueFiletoGrid (2)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="light_train" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pre-eval/DataLattice" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pre-eval/DataLattice/TxtTrueFiletoGrid.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -114,9 +141,11 @@
       <item itemvalue="Python.TxtTrueFiletoGrid" />
       <item itemvalue="Python.TxtTrueFiletoGrid (1)" />
       <item itemvalue="Python.npyTest" />
+      <item itemvalue="Python.TxtTrueFiletoGrid (2)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.TxtTrueFiletoGrid (2)" />
         <item itemvalue="Python.TxtTrueFiletoGrid (1)" />
         <item itemvalue="Python.npyTest" />
         <item itemvalue="Python.TxtTrueFiletoGrid" />
@@ -155,5 +184,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pre-eval/DataLattice/TxtTrueFiletoGrid.py</url>
+          <line>86</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

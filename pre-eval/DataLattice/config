@@ -1,0 +1,10 @@
+txtPath=real.txt
+output=Result/
+startTime=20200710000000
+endTime=20200711000000
+lonBegin=100
+lonEnd=130
+latBegin=24
+latEnd=30
+timeGap=1
+TruthFileDir=TruthFileDir/
