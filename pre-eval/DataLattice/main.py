@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import os
-import glob
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset as py_Dataset
-import datetime
-from config import read_config
-
+import FileWrite
+import config
 
 
 if __name__ == "__main__":
+    config = config.read_config()
 
-    config_dict = read_config()
+    file_write = FileWrite.TxtTrueFiletoGrid(config)
 
+    if config['nc'] == 1 :
+        file_write.all_trueFile_txt_to_wrf()
 
+    if config['np'] == 1 :
+        file_write.all_trueFile_txt_to_npy()
 

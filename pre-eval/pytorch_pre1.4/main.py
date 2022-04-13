@@ -114,7 +114,7 @@ def DoPredict(config_dict):
     # 写入等距离
     createDistanceNc(config_dict, lon_min, lon_max, lat_min, lat_max)
 
-    #
+    #todo  nc文件time是否需要保留
 
 
 

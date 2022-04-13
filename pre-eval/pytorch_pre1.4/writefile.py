@@ -130,6 +130,7 @@ class Writefile(object):
                     grid[int(self.grid_transformer_near4[i, j, 0, 1]), int(self.grid_transformer_near4[i, j, 1, 1])] = pre_grid[i, j]
 
         grid = np.flip(grid, axis=0)
+        #todo 此时grid就是等经纬度了 可以直接输出就行
         #test
         dt_d = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=hour_plus)
         # grid【1，1】 = 1
@@ -145,8 +146,9 @@ class Writefile(object):
         #         file.write(temp+'\t')
 
         #
+        print(grid.shape)
         grid = grid.flatten()
-
+        print(grid.shape)
         st = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M')
         dt = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M') + datetime.timedelta(hours=hour_plus)
         savepath = os.path.join(self.config_dict['ResultSavePath'], '{}_h{}.dat'.format(dt.strftime('%Y%m%d%H%M'), hour_plus))
