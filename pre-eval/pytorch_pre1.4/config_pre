@@ -8,7 +8,6 @@ LightOnlyModelFilePath=OnlyObsNet_Models/model_maxETS.pkl
 WRFOnlyModelFilePath=OnlyWRFNet_Models/model_maxETS.pkl
 ResultSavePath=Result/
 ResultDistanceSavePath=Result/Equal_Distance/
-EvalutionDistanceSavePath=/home/wrfelec05/zhou/evaluation_eqdis/input_examples/pre_dis
 IniFileDir=INI/
 Datetime=202006101650
 Threshold=0.5

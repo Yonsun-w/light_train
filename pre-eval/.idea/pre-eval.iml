@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.6 (light)" jdkType="Python SDK" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/DataLattice" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/evaluation_eqdis" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pytorch_pre1.4" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pytorch_train" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Remote Python 3.6.13 (sftp://wenjiahua@172.31.246.20:22/home/wenjiahua/miniconda3/envs/Myenv/bin/python3.6)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

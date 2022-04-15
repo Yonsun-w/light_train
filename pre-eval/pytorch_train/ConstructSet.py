@@ -64,6 +64,7 @@ def constructSet(config_dict):
         print('available case: time={}'.format(ddt))
         available_list.append(ddt.strftime('%Y%m%d%H%M'))
 
+
     np.random.shuffle(available_list)
     available_num = len(available_list)
     validate_ratio = 0.2

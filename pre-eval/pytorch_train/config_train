@@ -1,9 +1,9 @@
-WRFFileDir=/data/wenjiahua/ADSNet_testdata/WRFFile/
-TruthFileDir=/data/wenjiahua/ADSNet_testdata/lightningFile/
-TruthFileDirGrid=/data/wenjiahua/ADSNet_testdata/lightningFileGrid/
+WRFFileDir=/data/wenjiahua/light_data/ADSNet_testdata/WRFFile/
+TruthFileDir=/data/wenjiahua/light_data/ADSNet_testdata/lightningFile/
+TruthFileDirGrid=/data/wenjiahua/light_data/ADSNet_testdata/lightningFileGrid/
 VisResultFileDir=none
-ModelFileDir=/data/wenjiahua/ADSNet_testdata/Models/
-RecordFileDir=/data/wenjiahua/ADSNet_testdata/Records/
+ModelFileDir=/data/wenjiahua/light_data/ADSNet_testdata/Models/
+RecordFileDir=/data/wenjiahua/light_data/ADSNet_testdata/Records/
 GridRowColNum=159
 ForecastHourNum=12
 TruthHistoryHourNum=3

@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from layers.ConvLSTM import ConvLSTM2D
-
 class Encoder_wrf_model(nn.Module):
     def __init__(self, tra_frames, channels, config_dict):
         super(Encoder_wrf_model, self).__init__()

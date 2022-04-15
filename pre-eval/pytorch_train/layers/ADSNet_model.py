@@ -103,10 +103,4 @@ class ADSNet_Model(nn.Module):
         return pre_frames
 
 if __name__ == "__main__":
-    from config import read_config
-    config_dict = read_config()
-    wrf = torch.zeros(1, 12, config_dict['GridRowColNum'], config_dict['GridRowColNum'], 29)
-    obs = torch.zeros(1, 3, config_dict['GridRowColNum'], config_dict['GridRowColNum'], 1)
-    model = ADSNet_Model(obs_tra_frames=3, obs_channels=1, wrf_tra_frames=12, wrf_channels=29, config_dict=config_dict)
-    pre_frames = model(wrf, obs)
-    print(pre_frames.shape)
+    print('')

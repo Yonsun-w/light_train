@@ -72,7 +72,6 @@ def DoTrain(config_dict):
             wrf = wrf.to(config_dict['Device'])
             obs = obs.to(config_dict['Device'])
             label = label.to(config_dict['Device'])
-
             pre_frames = model(wrf, obs)
 
             # backward
@@ -96,7 +95,7 @@ def DoTrain(config_dict):
 
 
 if __name__ == "__main__":
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '6'
 
     config_dict = read_config()
 

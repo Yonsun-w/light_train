@@ -46,8 +46,6 @@ def read_config():
                 config_info[key] = item[1]
             elif key == 'ResultDistanceSavePath':
                 config_info[key] = item[1]
-            elif key == 'EvalutionDistanceSavePath':
-                config_info[key] = item[1]
             else:
                 print('no this item: {}'.format(key))
                 assert False

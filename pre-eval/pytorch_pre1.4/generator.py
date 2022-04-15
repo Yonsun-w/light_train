@@ -9,18 +9,23 @@ from netCDF4 import Dataset
 class LightingToGird(object):
     def __init__(self, config_dict):
         mn = config_dict['GridRowColNum']
-        #netCDF4 read .nc file split to Longitude, latitude
+
+        # netCDF4 read .nc file split to Longitude, latitude
+        # todo 读取经纬度信息？？ 那既然读取的是一个文件的一列 怎么设置为手动？？
         latlon_nc = Dataset(config_dict['LatlonFilePath'])
+        # 取nc文件里所有的经纬度讯息
         lat_ = latlon_nc.variables['lat'][:, :]
         lon_ = latlon_nc.variables['lon'][:, :]
         latlon_nc.close()
 
         latlon = np.zeros(shape=[mn * mn, 2], dtype=float)
-        #Longitude, latitude to grid
+        # Longitude, latitude to grid
+        # 给所有行的第一个数据 第二个数据赋值  每一个实体为(lat,lon)
         latlon[:, 0] = lat_.reshape(mn * mn)
         latlon[:, 1] = lon_.reshape(mn * mn)
 
         # a mistake: lat->longitude lon->latitude
+        # 获取最大的经纬度讯息
         self.lat_max = np.max(latlon[:, 0], keepdims=False)
         self.lat_min = np.min(latlon[:, 0], keepdims=False)
         self.lon_max = np.max(latlon[:, 1], keepdims=False)
@@ -35,6 +40,7 @@ class LightingToGird(object):
         # print(self.lat_max_, self.lat_min_, self.lon_max_, self.lon_min_, (self.lat_max_ - self.lat_min_) / 0.04, (self.lon_max_ - self.lon_min_) / 0.04)
 
         # single grid point range, rough estimation
+        # todo 这是干嘛的
         self.sin_distance = (self._cal_distance(latlon[0][0], latlon[0][1], latlon[1][0], latlon[1][1]) +
                              self._cal_distance(latlon[-1][0], latlon[-1][1], latlon[-2][0], latlon[-2][1])) / 2
         self.latlon = latlon
@@ -85,20 +91,26 @@ class LightingToGird(object):
 class Dataloader(object):
     def __init__(self, config_dict):
         self.config_dict = config_dict
+
         self.light_grid_generator = LightingToGird(config_dict)
+
         self.is_wrffile_exist, self.is_obsfile_exist, self.WRFFileName, self.WRFFileDeltaHour = self._checkData()
 
     def _checkData(self):
-        config_dict = self.config_dict
-        ddt = datetime.datetime.strptime(config_dict['Datetime'], '%Y%m%d%H%M')
+        # 首先获取日期
+        ddt = datetime.datetime.strptime(self.config_dict['Datetime'], '%Y%m%d%H%M')
+        # 将日期向后推8小时转换为世界时？ 再推6小时(貌似是为了增加鲁棒性) 得到wrf的时间
         wrf_time = ddt + datetime.timedelta(hours=-8) + datetime.timedelta(hours=(-6))
+        #_getTimePeriod这里貌似链接上一步 也是增加鲁棒性
         wrf_time_hour, delta_hour = self._getTimePeriod(wrf_time)
+        # delta_hour是推迟的时间？
         delta_hour += 6
-        nc_filename = config_dict['WRFFileDir'] + wrf_time.strftime("%Y-%m-%d") + '_' + wrf_time_hour + '.wrfvar.nc'
 
+        # 获取nc文件路径
+        nc_filename = self.config_dict['WRFFileDir'] + wrf_time.strftime("%Y-%m-%d") + '_' + wrf_time_hour + '.wrfvar.nc'
         wrf_time2 = wrf_time + datetime.timedelta(hours=(-6))
         wrf_time_hour2, delta_hour2 = self._getTimePeriod(wrf_time2)
-        nc_filename2 = config_dict['WRFFileDir'] + wrf_time2.strftime("%Y-%m-%d") + '_' + wrf_time_hour2 + '.wrfvar.nc'
+        nc_filename2 = self.config_dict['WRFFileDir'] + wrf_time2.strftime("%Y-%m-%d") + '_' + wrf_time_hour2 + '.wrfvar.nc'
         if os.path.exists(nc_filename):
             print('WRF file exist! (input file:{})'.format(nc_filename))
             is_wrffile_exist = True
@@ -138,6 +150,7 @@ class Dataloader(object):
         delta_hour = hour - int(nchour)
         return nchour, delta_hour
 
+    # todo wrf就是nc文件吧？
     def _loadWRFData(self):  # 20200619
         ncfilepath = self.WRFFileName
         delta_hour = self.WRFFileDeltaHour
@@ -146,7 +159,6 @@ class Dataloader(object):
         variables2d = ['W_max']
         sumVariables2d = ['RAINNC']
         param_list = ['QICE', 'QSNOW', 'QGRAUP', 'W_max', 'RAINNC']
-
         m = config_dict['GridRowColNum']
         n = config_dict['GridRowColNum']
         grid_list = []
@@ -227,6 +239,7 @@ if __name__ == "__main__":
     with open(TrainSetFilePath) as file:
         for line in file:
             train_list.append(line.rstrip('\n').rstrip('\r\n'))
+    ##todo 这里是什么情况
     train_data = DataGenerator(train_list, config_dict)
     train_loader = DataLoader(dataset=train_data, batch_size=1, shuffle=True, num_workers=8)
     for i, (X, y) in enumerate(train_loader):
