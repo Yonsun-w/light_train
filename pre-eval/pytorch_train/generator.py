@@ -2,7 +2,7 @@ import numpy as np
 from torch.utils.data import Dataset as py_Dataset
 import datetime
 from netCDF4 import Dataset
-
+import os
 
 
 variables3d = ['QICE', 'QGRAUP', 'QSNOW']
@@ -27,6 +27,61 @@ def getTimePeriod(dt):
         print('error')
     delta_hour = hour - int(nchour)
     return nchour, delta_hour
+
+# 这个方法是魔改getHoursGridFromSmallNC方法，由于之前学长已经将nc处理为npy了
+# 所以这里我们是读取npy文件 npy_father_filepath是一个文件夹，他就对应了过去的一个具体的nc文件
+def getHoursGridFromSmallNC_npy(npy_father_filepath, delta_hour, config_dict):  # 20200619
+    variables3d = ['QICE', 'QGRAUP', 'QSNOW']
+    variables2d = ['W_max']
+    sumVariables2d = ['RAINNC']
+    param_list = ['QICE', 'QSNOW', 'QGRAUP', 'W_max', 'RAINNC']
+
+    m = config_dict['GridRowColNum']
+    n = config_dict['GridRowColNum']
+    grid_list = []
+    if config_dict['WRFChannelNum'] == 217:
+        varone_test = os.path.join(npy_father_filepath, 'V.npy')
+        grid = np.load(varone_test)
+        grid = grid[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+        grid = np.transpose(grid, (0, 2, 3, 1))  # (12, 159, 159, n)
+    else:
+        for s in param_list:
+            if s in variables3d:
+                file_path = os.path.join(npy_father_filepath, s, '.npy')
+                temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+                temp[temp < 0] = 0
+                if config_dict['WRFChannelNum'] == 29:
+                    ave_3 = np.zeros((config_dict['ForecastHourNum'], m, n, 9))
+                    for i in range(9):
+                        ave_3[:, :, :, i] = np.mean(temp[:, 3 * i:3 * (i + 1), :, :], axis=1)  # (12, 159, 159, 9)
+                    grid_list.append(ave_3)
+                else:
+                    temp = np.transpose(temp, (0, 2, 3, 1))  # (12, 159, 159, 27)
+                    grid_list.append(temp)
+            elif s in variables2d:
+                if s == 'W_max':
+                    file_path = os.path.join(npy_father_filepath, 'W', '.npy')
+                    tmp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+                    tmp = np.transpose(tmp, (0, 2, 3, 1))
+                    temp = np.max(tmp, axis=-1, keepdims=True)
+                else:
+                    file_path = os.path.join(npy_father_filepath, s, '.npy')
+                    if not os.path.exists(file_path):
+                        print("这个文件没有={}".format(file_path))
+                    temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
+                grid_list.append(temp)
+            elif s in sumVariables2d:
+                file_path = os.path.join(npy_father_filepath, s, '.npy')
+                if not os.path.exists(file_path):
+                    print("这个文件没有={}".format(file_path))
+                temp = np.load(file_path)[delta_hour + 1:delta_hour + config_dict['ForecastHourNum'] + 1, 0:m, 0:n] - \
+                       np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
+                temp = temp[:, :, :, np.newaxis]
+                grid_list.append(temp)
+        grid = np.concatenate(grid_list, axis=-1)
+
+    return grid
+
 
 def getHoursGridFromSmallNC(ncfilepath, delta_hour, config_dict):  # 20200619
     variables3d = ['QICE', 'QGRAUP', 'QSNOW']
@@ -92,6 +147,7 @@ class DataGenerator(py_Dataset):
 
         ddt = datetime.datetime.strptime(datetime_peroid, '%Y%m%d%H%M')
         # read WRF
+        # UTC是世界时
         utc = ddt + datetime.timedelta(hours=-8)
         ft = utc + datetime.timedelta(hours=(-6))
         nchour, delta_hour = getTimePeriod(ft)
@@ -102,7 +158,13 @@ class DataGenerator(py_Dataset):
         ncFilepath = self.config_dict['WRFFileDir'] + ft.strftime("%Y-%m-%d") + '_' + nchour + '.wrfvar.nc'
         # '/home/wrfelec05/bjdata_test/2020-06-11_00.wrfvar.nc'
 
-        nc_grid = getHoursGridFromSmallNC(ncFilepath, delta_hour, self.config_dict)
+        npyFilepath = os.path.join(self.config_dict['WRFFileDir'], ft.strftime("%Y%m%d"))
+        # 由于wrf(也就是nc格式)存了好几个矩阵，所以一个nc文件转成了好几个npy，这里一个wrf对应的
+        # 是一个文件夹  '/data/wenjiahua/light_data/ADSNet_testdata/WRF_data/20200831'
+
+        # nc_grid = getHoursGridFromSmallNC(ncFilepath, delta_hour, self.config_dict)
+
+        nc_grid = getHoursGridFromSmallNC_npy(npyFilepath, delta_hour, self.config_dict)
 
         wrf_batch[:, :, :, 0:self.config_dict['WRFChannelNum']] = nc_grid
 

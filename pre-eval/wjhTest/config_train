@@ -1,5 +1,5 @@
-WRFFileDir=/data/wenjiahua/light_data/ADSNet_testdata/WRF_data
-TruthFileDir=/data/wenjiahua/light_data/ADSNet_testdata/light_data_ori_18-20/20190101-1231
+WRFFileDir=/data/wenjiahua/light_data/ADSNet_testdata/WRFFile/
+TruthFileDir=/data/wenjiahua/light_data/ADSNet_testdata/lightningFile/
 TruthFileDirGrid=/data/wenjiahua/light_data/ADSNet_testdata/lightningFileGrid/
 VisResultFileDir=none
 ModelFileDir=/data/wenjiahua/light_data/ADSNet_testdata/Models/
@@ -7,7 +7,7 @@ RecordFileDir=/data/wenjiahua/light_data/ADSNet_testdata/Records/
 GridRowColNum=159
 ForecastHourNum=12
 TruthHistoryHourNum=3
-WRFChannelNum=83
+WRFChannelNum=217
 ScanStartTime=202203132339
 ScanEndTime=202203132339
 NetName=ADSNet
