@@ -8,9 +8,7 @@ def read_config():
             line = line.rstrip('\r\n')
             item = line.split('=')
             key = item[0]
-            if key == 'FilePath':
-                config_info[key] = item[1]
-            elif key == 'preFile':
+            if key == 'preFile':
                 config_info[key] = item[1]
             elif key == 'TrueFileGrid':
                 config_info[key] = item[1]

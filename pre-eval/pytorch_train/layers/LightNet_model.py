@@ -132,6 +132,8 @@ class Decoder_model(nn.Module):
 
 
 class LightNet_Model(nn.Module):
+     # obs_tra_frames = TruthHistoryHourNum   wrf_tra_frames=config_dict['ForecastHourNum']
+     #  wrf_channels=config_dict['WRFChannelNum'],
     def __init__(self, obs_tra_frames, obs_channels, wrf_tra_frames, wrf_channels, config_dict):
         super(LightNet_Model, self).__init__()
         self.config_dict = config_dict

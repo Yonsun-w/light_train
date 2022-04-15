@@ -31,7 +31,6 @@ def checkData(time, true_file_grid, pre_file, pre_equal_distance, pre_duration, 
 def main(config_dict):
     eval_results = pd.DataFrame(
         columns=['Time', 'Time Period', 'Threshold', 'Neighborhood Range'] + config_dict['EvaluationMethod'])
-    path = config_dict['FilePath']
     pre_duration = config_dict['PreDuration']
     time_step = config_dict['TimeStep']
     ##这三个参数用来替代path obs pre pre_dis

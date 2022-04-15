@@ -8,9 +8,7 @@ def read_config():
             line = line.rstrip('\r\n')
             item = line.split('=')
             key = item[0]
-            if key == 'output':
-                config_info[key] = item[1]
-            elif key == 'startTime':
+            if key == 'startTime':
                 config_info[key] = item[1].replace('_', '')
             elif key == 'endTime':
                 config_info[key] = item[1].replace('_', '')

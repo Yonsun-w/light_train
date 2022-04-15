@@ -2,6 +2,7 @@ import os
 
 import numpy
 import numpy as np
+import torch
 
 def readNc():
     # euqal_distanc_path = 'D:\\雷电预测文件\\雷电预测\\github\\light_train\\pre-eval\\evaluation_eqdis\\input_examples\\pre_dis\\Equal_Distance\\202006110150_h9.npy'
@@ -23,15 +24,9 @@ def readNc():
 
 
 if __name__ == '__main__':
-    path = 'test.txt'
-
-    f = open(path, 'r+', encoding='UTF-8')
-
-    for line in f:
-        line = 'test'
-        print(line)
-
-    f.close()
+    a = torch.zeros(1,1,1).requires_grad()
+    print(a.shape)
+    print(a)
 
 
 
