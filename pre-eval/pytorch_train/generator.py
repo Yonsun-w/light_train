@@ -47,7 +47,7 @@ def getHoursGridFromSmallNC_npy(npy_father_filepath, delta_hour, config_dict):  
     else:
         for s in param_list:
             if s in variables3d:
-                file_path = os.path.join(npy_father_filepath, s, '.npy')
+                file_path = os.path.join(npy_father_filepath, s + '.npy')
                 temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
                 temp[temp < 0] = 0
                 if config_dict['WRFChannelNum'] == 29:
@@ -60,18 +60,18 @@ def getHoursGridFromSmallNC_npy(npy_father_filepath, delta_hour, config_dict):  
                     grid_list.append(temp)
             elif s in variables2d:
                 if s == 'W_max':
-                    file_path = os.path.join(npy_father_filepath, 'W', '.npy')
+                    file_path = os.path.join(npy_father_filepath, 'W' + '.npy')
                     tmp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
                     tmp = np.transpose(tmp, (0, 2, 3, 1))
                     temp = np.max(tmp, axis=-1, keepdims=True)
                 else:
-                    file_path = os.path.join(npy_father_filepath, s, '.npy')
+                    file_path = os.path.join(npy_father_filepath, s +'.npy')
                     if not os.path.exists(file_path):
                         print("这个文件没有={}".format(file_path))
                     temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
                 grid_list.append(temp)
             elif s in sumVariables2d:
-                file_path = os.path.join(npy_father_filepath, s, '.npy')
+                file_path = os.path.join(npy_father_filepath, s + '.npy')
                 if not os.path.exists(file_path):
                     print("这个文件没有={}".format(file_path))
                 temp = np.load(file_path)[delta_hour + 1:delta_hour + config_dict['ForecastHourNum'] + 1, 0:m, 0:n] - \
@@ -158,12 +158,10 @@ class DataGenerator(py_Dataset):
         ncFilepath = self.config_dict['WRFFileDir'] + ft.strftime("%Y-%m-%d") + '_' + nchour + '.wrfvar.nc'
         # '/home/wrfelec05/bjdata_test/2020-06-11_00.wrfvar.nc'
 
-        npyFilepath = os.path.join(self.config_dict['WRFFileDir'], ft.strftime("%Y%m%d"))
+        npyFilepath = os.path.join(self.config_dict['WRFFileDir'], ft.strftime("%Y%m%d"), nchour)
+
         # 由于wrf(也就是nc格式)存了好几个矩阵，所以一个nc文件转成了好几个npy，这里一个wrf对应的
         # 是一个文件夹  '/data/wenjiahua/light_data/ADSNet_testdata/WRF_data/20200831'
-
-        # nc_grid = getHoursGridFromSmallNC(ncFilepath, delta_hour, self.config_dict)
-
         nc_grid = getHoursGridFromSmallNC_npy(npyFilepath, delta_hour, self.config_dict)
 
         wrf_batch[:, :, :, 0:self.config_dict['WRFChannelNum']] = nc_grid

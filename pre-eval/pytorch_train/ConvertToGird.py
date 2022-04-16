@@ -45,7 +45,7 @@ class LightingToGird(object):
         return d
 
     def _lalo_to_grid_new(self, la, lo):
-        if lo < self.lon_min_ or lo > self.lon_max_ or la < self.lat_min_ or la > self.lat_max_:
+        if lo < self.lon_min or lo > self.lon_max or la < self.lat_min or la > self.lat_max:
             return -1
         d = self._cal_distance(la, lo, self.latlon[:, 0], self.latlon[:, 1])
         if np.min(d) > self.sin_distance * np.sqrt(2):

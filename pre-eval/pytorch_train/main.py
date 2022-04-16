@@ -70,8 +70,11 @@ def DoTrain(config_dict):
             wrf, obs = X
             label = y
             wrf = wrf.to(config_dict['Device'])
+
             obs = obs.to(config_dict['Device'])
+
             label = label.to(config_dict['Device'])
+
             pre_frames = model(wrf, obs)
 
             # backward
@@ -92,15 +95,11 @@ def DoTrain(config_dict):
 
         model_eval_valdata.eval(val_loader, model, epoch)
 
-
-
-if __name__ == "__main__":
-    os.environ['CUDA_VISIBLE_DEVICES'] = '6'
-
-    config_dict = read_config()
+# 生产原始训练数据,主要工作室生成各个时间段内的闪电npy文件 flag代表是否覆盖生成，默认为否
+def init_old_data(config_dict,flag = False):
 
     # generator light grid
-    if os.path.exists(config_dict['TruthFileDirGrid']) and len(glob.glob(config_dict['TruthFileDirGrid']+'*')) != 0:
+    if os.path.exists(config_dict['TruthFileDirGrid']) and len(glob.glob(config_dict['TruthFileDirGrid']+'*')) != 0 and not flag:
         print('Light grid data existed')
     else:
         from ConvertToGird import LightingToGird
@@ -117,7 +116,8 @@ if __name__ == "__main__":
             datetimelist.append(tt)
             tt += datetime.timedelta(hours=1)
         for dt in datetimelist:
-            truthfilepath = config_dict['TruthFileDir'] + dt.strftime('%Y_%m_%d') + '.txt'
+            truthfilepath = os.path.join(config_dict['TruthFileDir'], dt.strftime('%Y'), dt.strftime('%Y_%m_%d') + '.txt')
+
             if not os.path.exists(truthfilepath):
                 print('Lighting data file `{}` not exist!'.format(truthfilepath))
                 continue
@@ -125,8 +125,12 @@ if __name__ == "__main__":
             dt_str = dt.strftime('%Y%m%d%H%M')
             truthgridfilename = dt_str + '_truth'
             truthgridfilepath = config_dict['TruthFileDirGrid'] + truthgridfilename
-            np.save(truthgridfilepath + '.npy', grid)
-            print('{}_truth.npy generated successfully'.format(dt_str))
+            if not os.path.exists(truthgridfilepath) or flag:
+                np.save(truthgridfilepath + '.npy', grid)
+                print('{}_truth.npy generated successfully'.format(dt_str))
+            else:
+                print('{}.npy已经存在并且模式为不覆盖'.format(truthgridfilepath))
+
 
     # Constructing set automatically
     if os.path.exists('TrainCase.txt') and os.path.exists('ValCase.txt'):
@@ -142,7 +146,19 @@ if __name__ == "__main__":
     if not os.path.isdir(config_dict['RecordFileDir']):
         os.makedirs(config_dict['RecordFileDir'])
 
-    # train
+    print('初始化数据已经生产完毕,现在可以开始训练了')
+
+
+
+
+if __name__ == "__main__":
+    os.environ['CUDA_VISIBLE_DEVICES'] = '6'
+
+    config_dict = read_config()
+
+    init_old_data(config_dict, flag=True)
+
+    # #train
     DoTrain(config_dict)
 
 
