@@ -126,7 +126,6 @@ class Model_eval(object):
             wrf = wrf.to(self.config_dict['Device'])
             obs = obs.to(self.config_dict['Device'])
             label = label.to(self.config_dict['Device'])
-
             pre_frames = model(wrf, obs)
 
             # output

@@ -14,6 +14,7 @@ from layers.OnlyObsNet_model import OnlyObsNet_Model
 from layers.OnlyWRFNet_model import OnlyWRFNet_Model
 from generator import DataGenerator
 from scores import Cal_params_epoch, Model_eval
+from generator import getTimePeriod
 
 def selectModel(config_dict):
     if config_dict['NetName'] == 'ADSNet':
@@ -33,6 +34,52 @@ def selectModel(config_dict):
         assert False
     return model
 
+def time_data_iscomplete(time_str, config_dict):
+
+    time_str = time_str.rstrip('\n')
+    time_str = time_str.rstrip('\r\n')
+    if time_str == '':
+        return False
+    ddt = datetime.datetime.strptime(time_str, "%Y%m%d%H%M")
+    is_complete = True
+    # 首先检查wrf
+    wrf_path = os.path.join(config_dict['WRFFileDir'], ddt.strftime("%Y%m%d"))
+    wrf_data = ['00','06','12','18']
+    for s in wrf_data :
+        if not os.path.isdir(os.path.join(wrf_path,s)):
+            is_complete = False
+
+    #检测obs真实数据
+    obs_path = os.path.join(config_dict['TruthFileDir'], ddt.strftime("%Y"))
+    if not os.path.exists(os.path.join(obs_path, ddt.strftime("%Y_%m_%d") + '.txt')):
+        is_complete = False
+
+    # read WRF
+    # UTC是世界时
+    utc = ddt + datetime.timedelta(hours=-8)
+    ft = utc + datetime.timedelta(hours=(-6))
+    nchour, delta_hour = getTimePeriod(ft)
+    delta_hour += 6
+    npyFilepath = os.path.join(config_dict['WRFFileDir'], ft.strftime("%Y%m%d"), nchour)
+    if not os.path.exists(npyFilepath):
+        is_complete = False
+
+    # read labels
+    for hour_plus in range(config_dict['ForecastHourNum']):
+        dt = ddt + datetime.timedelta(hours=hour_plus)
+        tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
+        if not os.path.exists(tFilePath):
+            is_complete = False
+    # read history observations
+    for hour_plus in range(config_dict['TruthHistoryHourNum']):
+        dt = ddt + datetime.timedelta(hours=hour_plus - config_dict['TruthHistoryHourNum'])
+        tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth.npy'
+        if not os.path.exists(tFilePath):
+            is_complete = False
+    return is_complete
+
+
+
 def DoTrain(config_dict):
     # data index
     TrainSetFilePath = 'TrainCase.txt'
@@ -40,11 +87,17 @@ def DoTrain(config_dict):
     train_list = []
     with open(TrainSetFilePath) as file:
         for line in file:
-            train_list.append(line.rstrip('\n').rstrip('\r\n'))
+            # 由于数据不全 所以需要校验数据的完整
+            if time_data_iscomplete(line, config_dict):
+                train_list.append(line.rstrip('\n').rstrip('\r\n'))
     val_list = []
     with open(ValSetFilePath) as file:
         for line in file:
-            val_list.append(line.rstrip('\n').rstrip('\r\n'))
+            # 由于数据不全 所以需要校验数据的完整
+            if time_data_iscomplete(line, config_dict):
+                val_list.append(line.rstrip('\n').rstrip('\r\n'))
+
+    print('加载数据完毕，一共有{}训练集，val{}测试集'.format(len(train_list), len(val_list)))
 
     # data
     train_data = DataGenerator(train_list, config_dict)
@@ -64,6 +117,7 @@ def DoTrain(config_dict):
     # eval
     model_eval_valdata = Model_eval(config_dict)
 
+
     for epoch in range(config_dict['EpochNum']):
         # train_calparams_epoch = Cal_params_epoch()
         for i, (X, y) in enumerate(train_loader):
@@ -76,6 +130,7 @@ def DoTrain(config_dict):
             label = label.to(config_dict['Device'])
 
             pre_frames = model(wrf, obs)
+
 
             # backward
             optimizer.zero_grad()
@@ -156,7 +211,7 @@ if __name__ == "__main__":
 
     config_dict = read_config()
 
-    init_old_data(config_dict, flag=True)
+    init_old_data(config_dict)
 
     # #train
     DoTrain(config_dict)
