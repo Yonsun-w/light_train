@@ -34,10 +34,29 @@ def selectModel(config_dict):
     return model
 
 def DoTrain(config_dict):
-    # data index
-    TrainSetFilePath = 'TrainCase.txt'
-    ValSetFilePath = 'ValCase.txt'
+    # data index 之前的逻辑 wjh改 我认为没必要弄两个txt文件，而应该自动化
+    # TrainSetFilePath = 'TrainCase.txt'
+    # ValSetFilePath = 'ValCase.txt'
+    # train_list = []
+    # with open(TrainSetFilePath) as file:
+    #     for line in file:
+    #         train_list.append(line.rstrip('\n').rstrip('\r\n'))
+    # val_list = []
+    # with open(ValSetFilePath) as file:
+    #     for line in file:
+    #         val_list.append(line.rstrip('\n').rstrip('\r\n'))
+
+    # 用这种方式载入数据集
+    st = config_dict['ScanStartTime']
+    et = config_dict['ScanEndTime']
+    #训练集开始的地方
+    train_data = datetime.datetime.strptime('2019010200', '%Y%m%d')
     train_list = []
+    val_list = []
+
+
+
+
     with open(TrainSetFilePath) as file:
         for line in file:
             train_list.append(line.rstrip('\n').rstrip('\r\n'))
@@ -157,9 +176,9 @@ if __name__ == "__main__":
     config_dict = read_config()
 
     init_old_data(config_dict, flag=True)
-
-    # #train
-    DoTrain(config_dict)
-
+    #
+    # # #train
+    # DoTrain(config_dict)
+    #
 
 

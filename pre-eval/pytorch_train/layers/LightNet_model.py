@@ -31,7 +31,6 @@ class Encoder_wrf_model(nn.Module):
 
         return wrf_h, wrf_c
 
-
 class Encoder_obs_model(nn.Module):
     def __init__(self, tra_frames, channels, config_dict):
         super(Encoder_obs_model, self).__init__()
@@ -60,7 +59,6 @@ class Encoder_obs_model(nn.Module):
             obs_h, obs_c = self.obs_encoder_convLSTM2D(obs_conv[i], obs_h, obs_c)
 
         return obs_h, obs_c
-
 
 class Fusion_model(nn.Module):
     def __init__(self, filters_list_input, filters_list_output, config_dict):
@@ -95,7 +93,6 @@ class Fusion_model(nn.Module):
         # encoder_concat = torch.cat(encoder_concat, dim=1)
         # fusion_output = torch.cat([h_concat, c_concat, encoder_concat], dim=1)
         return h_concat, c_concat
-
 
 class Decoder_model(nn.Module):
     def __init__(self, pre_frames, ConvLSTM2D_filters, config_dict):
