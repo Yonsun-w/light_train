@@ -51,6 +51,8 @@ class Cal_params_epoch(object):
         return torch.div(n1 - r, n1 + n2 + n3 - r + self.eps)
 
     def cal_batch(self, y_true, y_pred):
+        print('y_true>0 = {}, y_pred >0 = {}'.format(torch.sum(y_true>0), torch.sum(y_pred>0)))
+
         y_true, y_pred = self._transform(y_true, y_pred)
         n1 = torch.sum((y_pred > 0) & (y_true > 0))
         n2 = torch.sum((y_pred > 0) & (y_true < 1))
@@ -121,12 +123,11 @@ class Model_eval(object):
     def eval(self, dataloader, model, epoch):
         val_calparams_epoch = Cal_params_epoch()
         for i, (X, y) in enumerate(dataloader):
-            wrf, obs = X
+            wrf, obs, npy_name = X
             label = y
             wrf = wrf.to(self.config_dict['Device'])
             obs = obs.to(self.config_dict['Device'])
             label = label.to(self.config_dict['Device'])
-
             pre_frames = model(wrf, obs)
 
             # output
@@ -134,7 +135,7 @@ class Model_eval(object):
             sumpod, sumfar, sumts, sumets = val_calparams_epoch.cal_batch_sum(label, pre_frames)
             info = 'VAL INFO: epoch:{} ({}/{}) \nPOD:{:.5f}  FAR:{:.5f}  TS:{:.5f}  ETS:{:.5f}\nsumPOD:{:.5f}  sumFAR:{:.5f}  sumTS:{:.5f}  sumETS:{:.5f}\n' \
                 .format(epoch, i + 1, len(dataloader), pod, far, ts, ets, sumpod, sumfar, sumts, sumets)
-            print(info)
+            print(info, '样本为={}'.format(npy_name))
         sumpod, sumfar, sumts, sumets = val_calparams_epoch.cal_epoch_sum()
         info = 'VAL EPOCH INFO: epoch:{} \nsumPOD:{:.5f}  sumFAR:{:.5f}  sumTS:{:.5f}  sumETS:{:.5f}\n'.format(epoch, sumpod, sumfar, sumts, sumets)
         print(info)

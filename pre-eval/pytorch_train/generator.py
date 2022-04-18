@@ -28,58 +28,80 @@ def getTimePeriod(dt):
     delta_hour = hour - int(nchour)
     return nchour, delta_hour
 
+
+# 这是我自己该写的
+# def getHoursGridFromSmallNC_npy(npy_father_filepath, delta_hour, config_dict):  # 20200619
+#     variables3d = ['QICE', 'QGRAUP', 'QSNOW']
+#     variables2d = ['W_max']
+#     sumVariables2d = ['RAINNC']
+#     param_list = ['QICE', 'QSNOW', 'QGRAUP', 'W_max', 'RAINNC']
+#
+#     m = config_dict['GridRowColNum']
+#     n = config_dict['GridRowColNum']
+#     grid_list = []
+#     if config_dict['WRFChannelNum'] == 217:
+#         varone_test = os.path.join(npy_father_filepath, 'V.npy')
+#         grid = np.load(varone_test)
+#         grid = grid[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+#         grid = np.transpose(grid, (0, 2, 3, 1))  # (12, 159, 159, n)
+#     else:
+#         for s in param_list:
+#             if s in variables3d:
+#                 file_path = os.path.join(npy_father_filepath, s + '.npy')
+#                 temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+#                 temp[temp < 0] = 0
+#                 if config_dict['WRFChannelNum'] == 29:
+#                     ave_3 = np.zeros((config_dict['ForecastHourNum'], m, n, 9))
+#                     for i in range(9):
+#                         ave_3[:, :, :, i] = np.mean(temp[:, 3 * i:3 * (i + 1), :, :], axis=1)  # (12, 159, 159, 9)
+#                     grid_list.append(ave_3)
+#                 else:
+#                     temp = np.transpose(temp, (0, 2, 3, 1))  # (12, 159, 159, 27)
+#                     grid_list.append(temp)
+#             elif s in variables2d:
+#                 if s == 'W_max':
+#                     file_path = os.path.join(npy_father_filepath, 'W' + '.npy')
+#                     tmp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+#                     tmp = np.transpose(tmp, (0, 2, 3, 1))
+#                     temp = np.max(tmp, axis=-1, keepdims=True)
+#                 else:
+#                     file_path = os.path.join(npy_father_filepath, s +'.npy')
+#                     if not os.path.exists(file_path):
+#                         print("这个文件没有={}".format(file_path))
+#                     temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
+#                 grid_list.append(temp)
+#             elif s in sumVariables2d:
+#                 file_path = os.path.join(npy_father_filepath, s + '.npy')
+#                 if not os.path.exists(file_path):
+#                     print("这个文件没有={}".format(file_path))
+#                 temp = np.load(file_path)[delta_hour + 1:delta_hour + config_dict['ForecastHourNum'] + 1, 0:m, 0:n] - \
+#                        np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
+#                 temp = temp[:, :, :, np.newaxis]
+#                 grid_list.append(temp)
+#         grid = np.concatenate(grid_list, axis=-1)
+#
+#     return grid
+
+
 # 这个方法是魔改getHoursGridFromSmallNC方法，由于之前学长已经将nc处理为npy了
 # 所以这里我们是读取npy文件 npy_father_filepath是一个文件夹，他就对应了过去的一个具体的nc文件
-def getHoursGridFromSmallNC_npy(npy_father_filepath, delta_hour, config_dict):  # 20200619
-    variables3d = ['QICE', 'QGRAUP', 'QSNOW']
-    variables2d = ['W_max']
-    sumVariables2d = ['RAINNC']
-    param_list = ['QICE', 'QSNOW', 'QGRAUP', 'W_max', 'RAINNC']
-
-    m = config_dict['GridRowColNum']
-    n = config_dict['GridRowColNum']
+def getHoursGridFromSmallNC_npy(filepath, delta_hour, config_dict):  # 20200619
+    # m = config_dict['GridRowColNum']
+    # n = config_dict['GridRowColNum']
     grid_list = []
-    if config_dict['WRFChannelNum'] == 217:
-        varone_test = os.path.join(npy_father_filepath, 'V.npy')
-        grid = np.load(varone_test)
-        grid = grid[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
-        grid = np.transpose(grid, (0, 2, 3, 1))  # (12, 159, 159, n)
-    else:
-        for s in param_list:
-            if s in variables3d:
-                file_path = os.path.join(npy_father_filepath, s + '.npy')
-                temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
-                temp[temp < 0] = 0
-                if config_dict['WRFChannelNum'] == 29:
-                    ave_3 = np.zeros((config_dict['ForecastHourNum'], m, n, 9))
-                    for i in range(9):
-                        ave_3[:, :, :, i] = np.mean(temp[:, 3 * i:3 * (i + 1), :, :], axis=1)  # (12, 159, 159, 9)
-                    grid_list.append(ave_3)
-                else:
-                    temp = np.transpose(temp, (0, 2, 3, 1))  # (12, 159, 159, 27)
-                    grid_list.append(temp)
-            elif s in variables2d:
-                if s == 'W_max':
-                    file_path = os.path.join(npy_father_filepath, 'W' + '.npy')
-                    tmp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
-                    tmp = np.transpose(tmp, (0, 2, 3, 1))
-                    temp = np.max(tmp, axis=-1, keepdims=True)
-                else:
-                    file_path = os.path.join(npy_father_filepath, s +'.npy')
-                    if not os.path.exists(file_path):
-                        print("这个文件没有={}".format(file_path))
-                    temp = np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
-                grid_list.append(temp)
-            elif s in sumVariables2d:
-                file_path = os.path.join(npy_father_filepath, s + '.npy')
-                if not os.path.exists(file_path):
-                    print("这个文件没有={}".format(file_path))
-                temp = np.load(file_path)[delta_hour + 1:delta_hour + config_dict['ForecastHourNum'] + 1, 0:m, 0:n] - \
-                       np.load(file_path)[delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
-                temp = temp[:, :, :, np.newaxis]
-                grid_list.append(temp)
-        grid = np.concatenate(grid_list, axis=-1)
-
+    param_list = ['QICE_ave3', 'QSNOW_ave3', 'QGRAUP_ave3', 'W_max', 'RAINNC']
+    # delta_hour -= 6
+    for s in param_list:
+        npy_grid = np.load(os.path.join(filepath, '{}.npy'.format(s)))
+        # npy_grid = npy_grid[delta_hour - config_dict['TruthHistoryHourNum']:delta_hour + config_dict['ForecastHourNum']]
+        npy_grid = npy_grid[delta_hour:delta_hour + config_dict['ForecastHourNum']]
+        if s == 'RAINNC':
+            npy_grid = npy_grid[:, np.newaxis, :, :]
+        elif s == 'W_max':
+            npy_grid = np.max(npy_grid, axis=1, keepdims=True)
+        npy_grid = np.transpose(npy_grid, (0, 2, 3, 1))  # (12, 159, 159, x)
+        grid_list.append(npy_grid)
+    grid = np.concatenate(grid_list, axis=-1)
     return grid
 
 
@@ -92,12 +114,13 @@ def getHoursGridFromSmallNC(ncfilepath, delta_hour, config_dict):  # 20200619
     m = config_dict['GridRowColNum']
     n = config_dict['GridRowColNum']
     grid_list = []
-    if config_dict['WRFChannelNum'] == 217:
-        with Dataset(ncfilepath) as nc:
-            grid = nc.variables['varone'][delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
-            grid = np.transpose(grid, (0, 2, 3, 1))  # (12, 159, 159, n)
-    else:
-        with Dataset(ncfilepath) as nc:
+    # if config_dict['WRFChannelNum'] == 217:
+    #     with Dataset(ncfilepath) as nc:
+    #         grid = nc.variables['varone'][delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]
+    #         grid = np.transpose(grid, (0, 2, 3, 1))  # (12, 159, 159, n)
+    # else:
+
+    with Dataset(ncfilepath) as nc:
             for s in param_list:
                 if s in variables3d:
                     temp = nc.variables[s][delta_hour:delta_hour + config_dict['ForecastHourNum'], :, 0:m, 0:n]  # (12, 27, 159, 159)
@@ -123,7 +146,8 @@ def getHoursGridFromSmallNC(ncfilepath, delta_hour, config_dict):  # 20200619
                            nc.variables[s][delta_hour:delta_hour + config_dict['ForecastHourNum'], 0:m, 0:n]
                     temp = temp[:, :, :, np.newaxis]
                     grid_list.append(temp)
-        grid = np.concatenate(grid_list, axis=-1)
+    grid = np.concatenate(grid_list, axis=-1)
+
     return grid
 
 class DataGenerator(py_Dataset):
@@ -171,6 +195,7 @@ class DataGenerator(py_Dataset):
             dt = ddt + datetime.timedelta(hours=hour_plus)
             tFilePath = self.config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
             truth_grid = np.load(tFilePath)
+            # print('{}时间段内，发生了{}次闪电'.format(dt, np.sum(truth_grid>0)))
             truth_grid[truth_grid > 1] = 1
             label_batch[hour_plus, :, :] = truth_grid[:, np.newaxis]
         # read history observations
@@ -180,7 +205,7 @@ class DataGenerator(py_Dataset):
             truth_grid = np.load(tFilePath)
             truth_grid = truth_grid.reshape(m, n)
             history_batch[hour_plus, :, :, :] = truth_grid[:, :, np.newaxis]
-        return [wrf_batch, history_batch], label_batch
+        return [wrf_batch, history_batch, ft.strftime("%Y%m%d")], label_batch
 
 
 if __name__ == "__main__":

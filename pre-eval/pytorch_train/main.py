@@ -5,7 +5,6 @@ import glob
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torch.utils.data import Dataset as py_Dataset
 import datetime
 from config import read_config
 from layers.ADSNet_model import ADSNet_Model
@@ -14,6 +13,8 @@ from layers.OnlyObsNet_model import OnlyObsNet_Model
 from layers.OnlyWRFNet_model import OnlyWRFNet_Model
 from generator import DataGenerator
 from scores import Cal_params_epoch, Model_eval
+from generator import getTimePeriod
+import datetime
 
 def selectModel(config_dict):
     if config_dict['NetName'] == 'ADSNet':
@@ -33,37 +34,98 @@ def selectModel(config_dict):
         assert False
     return model
 
+def time_data_iscomplete(time_str, config_dict):
+
+    time_str = time_str.rstrip('\n')
+    time_str = time_str.rstrip('\r\n')
+    if time_str == '':
+        return False
+    ddt = datetime.datetime.strptime(time_str, "%Y%m%d%H%M")
+    is_complete = True
+    # 首先检查wrf
+    wrf_path = os.path.join(config_dict['WRFFileDir'], ddt.strftime("%Y%m%d"))
+    wrf_data = ['00', '06', '12', '18']
+    for s in wrf_data :
+        if not os.path.isdir(os.path.join(wrf_path,s)):
+            is_complete = False
+
+    #检测obs真实数据
+    obs_path = os.path.join(config_dict['TruthFileDir'], ddt.strftime("%Y"))
+    txt_path = os.path.join(obs_path, ddt.strftime("%Y_%m_%d") + '.txt')
+    if not os.path.exists(txt_path):
+        is_complete = False
+
+    # read WRF
+    # UTC是世界时
+    utc = ddt + datetime.timedelta(hours=-8)
+    ft = utc + datetime.timedelta(hours=(-6))
+    nchour, delta_hour = getTimePeriod(ft)
+    delta_hour += 6
+    npyFilepath = os.path.join(config_dict['WRFFileDir'], ft.strftime("%Y%m%d"), nchour)
+    if not os.path.exists(npyFilepath):
+        is_complete = False
+
+    # read labels
+    for hour_plus in range(config_dict['ForecastHourNum']):
+        dt = ddt + datetime.timedelta(hours=hour_plus)
+        tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
+        # 假如标签缺失 返回False
+        if not os.path.exists(tFilePath):
+            is_complete = False
+        # 假如数据量太小(发生闪电次数不到20次) 也返回false
+        else:
+            grid = np.load(tFilePath)
+            if np.sum(grid) < 20:
+                print('tFilePath={}，sum={}'.format(tFilePath, np.sum(grid)))
+                is_complete = False
+
+    # read history observations
+    for hour_plus in range(config_dict['TruthHistoryHourNum']):
+        dt = ddt + datetime.timedelta(hours=hour_plus - config_dict['TruthHistoryHourNum'])
+        tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth.npy'
+        if not os.path.exists(tFilePath):
+            is_complete = False
+    return is_complete
+
+
+
 def DoTrain(config_dict):
-    # data index 之前的逻辑 wjh改 我认为没必要弄两个txt文件，而应该自动化
+    # data index wjh改 我觉得没必要用读取txt的方式 为了便于我的开发 我这里直接将扫描开始的位置作为数据开始的时间
     # TrainSetFilePath = 'TrainCase.txt'
     # ValSetFilePath = 'ValCase.txt'
     # train_list = []
     # with open(TrainSetFilePath) as file:
     #     for line in file:
-    #         train_list.append(line.rstrip('\n').rstrip('\r\n'))
+    #         # 由于数据不全 所以需要校验数据的完整
+    #         if time_data_iscomplete(line, config_dict):
+    #             train_list.append(line.rstrip('\n').rstrip('\r\n'))
     # val_list = []
     # with open(ValSetFilePath) as file:
     #     for line in file:
-    #         val_list.append(line.rstrip('\n').rstrip('\r\n'))
+    #         # 由于数据不全 所以需要校验数据的完整
+    #         if time_data_iscomplete(line, config_dict):
+    #             val_list.append(line.rstrip('\n').rstrip('\r\n'))
 
-    # 用这种方式载入数据集
-    st = config_dict['ScanStartTime']
-    et = config_dict['ScanEndTime']
-    #训练集开始的地方
-    train_data = datetime.datetime.strptime('2019010200', '%Y%m%d')
+
+    st = datetime.datetime.strptime(config_dict['ScanStartTime'], '%Y%m%d%H')
+    et = datetime.datetime.strptime(config_dict['ScanEndTime'], '%Y%m%d%H')
+    # 训练集开始载入的时间
+    train_time = datetime.datetime.strptime('2020070200', '%Y%m%d%H')
+
     train_list = []
     val_list = []
-
-
-
-
-    with open(TrainSetFilePath) as file:
-        for line in file:
-            train_list.append(line.rstrip('\n').rstrip('\r\n'))
-    val_list = []
-    with open(ValSetFilePath) as file:
-        for line in file:
+    print('加载从{}到{}之间的数据集，其中{}时间到{}时间作为测试集'.format(st,et,train_time,et))
+    while st <= et:
+        line = datetime.datetime.strftime(st, '%Y%m%d%H%M')
+        if not time_data_iscomplete(line, config_dict):
+            st += datetime.timedelta(hours=3)
+            continue
+        train_list.append(line.rstrip('\n').rstrip('\r\n'))
+        if st >= train_time:
             val_list.append(line.rstrip('\n').rstrip('\r\n'))
+        st += datetime.timedelta(hours=3)
+
+    print('加载数据完毕，一共有{}训练集，val{}测试集'.format(len(train_list), len(val_list)))
 
     # data
     train_data = DataGenerator(train_list, config_dict)
@@ -86,7 +148,7 @@ def DoTrain(config_dict):
     for epoch in range(config_dict['EpochNum']):
         # train_calparams_epoch = Cal_params_epoch()
         for i, (X, y) in enumerate(train_loader):
-            wrf, obs = X
+            wrf, obs, npyFilepath = X
             label = y
             wrf = wrf.to(config_dict['Device'])
 
@@ -96,6 +158,7 @@ def DoTrain(config_dict):
 
             pre_frames = model(wrf, obs)
 
+
             # backward
             optimizer.zero_grad()
             loss = criterion(torch.flatten(pre_frames), torch.flatten(label))
@@ -104,7 +167,9 @@ def DoTrain(config_dict):
             # update weights
             optimizer.step()
 
-            # output
+            print('pre  有{}个, label  有{}个, obs 有{}个,wrf ={}, npyFilepath={}'.format(torch.sum(pre_frames>0), torch.sum(label>0)
+                  , torch.sum(obs>0),torch.sum(wrf>0), npyFilepath))
+
             print('TRAIN INFO: epoch:{} ({}/{}) loss:{:.5f}'.format(epoch, i+1, len(train_loader), loss.item()))
             # pod, far, ts, ets = train_calparams_epoch.cal_batch(label, pre_frames)
             # sumpod, sumfar, sumts, sumets = train_calparams_epoch.cal_batch_sum(label, pre_frames)
@@ -174,11 +239,11 @@ if __name__ == "__main__":
     os.environ['CUDA_VISIBLE_DEVICES'] = '6'
 
     config_dict = read_config()
+    #
+    # init_old_data(config_dict)
 
-    init_old_data(config_dict, flag=True)
-    #
-    # # #train
-    # DoTrain(config_dict)
-    #
+    # #train
+    DoTrain(config_dict)
+
 
 
