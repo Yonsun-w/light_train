@@ -40,21 +40,15 @@ def time_data_iscomplete(time_str, config_dict):
     time_str = time_str.rstrip('\r\n')
     if time_str == '':
         return False
-    ddt = datetime.datetime.strptime(time_str, "%Y%m%d%H%M")
     is_complete = True
-    # 首先检查wrf
-    wrf_path = os.path.join(config_dict['WRFFileDir'], ddt.strftime("%Y%m%d"))
-    wrf_data = ['00', '06', '12', '18']
-    for s in wrf_data :
-        if not os.path.isdir(os.path.join(wrf_path,s)):
-            is_complete = False
+    m = config_dict['GridRowColNum']
+    n = config_dict['GridRowColNum']
+    wrf_batch = np.zeros(shape=[config_dict['ForecastHourNum'], m, n, config_dict['WRFChannelNum']],
+                         dtype=np.float32)
+    label_batch = np.zeros(shape=[config_dict['ForecastHourNum'], m * n, 1], dtype=np.float32)
+    history_batch = np.zeros(shape=[config_dict['TruthHistoryHourNum'], m, n, 1], dtype=np.float32)
 
-    #检测obs真实数据
-    obs_path = os.path.join(config_dict['TruthFileDir'], ddt.strftime("%Y"))
-    txt_path = os.path.join(obs_path, ddt.strftime("%Y_%m_%d") + '.txt')
-    if not os.path.exists(txt_path):
-        is_complete = False
-
+    ddt = datetime.datetime.strptime(time_str, '%Y%m%d%H%M')
     # read WRF
     # UTC是世界时
     utc = ddt + datetime.timedelta(hours=-8)
@@ -62,6 +56,7 @@ def time_data_iscomplete(time_str, config_dict):
     nchour, delta_hour = getTimePeriod(ft)
     delta_hour += 6
     npyFilepath = os.path.join(config_dict['WRFFileDir'], ft.strftime("%Y%m%d"), nchour)
+
     if not os.path.exists(npyFilepath):
         is_complete = False
 
@@ -69,24 +64,20 @@ def time_data_iscomplete(time_str, config_dict):
     for hour_plus in range(config_dict['ForecastHourNum']):
         dt = ddt + datetime.timedelta(hours=hour_plus)
         tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
-        # 假如标签缺失 返回False
         if not os.path.exists(tFilePath):
             is_complete = False
-        # 假如数据量太小(发生闪电次数不到20次) 也返回false
-        else:
-            grid = np.load(tFilePath)
-            if np.sum(grid) < 20:
-                print('tFilePath={}，sum={}'.format(tFilePath, np.sum(grid)))
-                is_complete = False
-
+        else :
+            a = np.load(tFilePath)
+            if np.sum(a) <= 10 :
+                False
     # read history observations
     for hour_plus in range(config_dict['TruthHistoryHourNum']):
         dt = ddt + datetime.timedelta(hours=hour_plus - config_dict['TruthHistoryHourNum'])
         tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth.npy'
         if not os.path.exists(tFilePath):
             is_complete = False
-    return is_complete
 
+    return is_complete
 
 
 def DoTrain(config_dict):
@@ -117,12 +108,13 @@ def DoTrain(config_dict):
     print('加载从{}到{}之间的数据集，其中{}时间到{}时间作为测试集'.format(st,et,train_time,et))
     while st <= et:
         line = datetime.datetime.strftime(st, '%Y%m%d%H%M')
-        if not time_data_iscomplete(line, config_dict):
-            st += datetime.timedelta(hours=3)
-            continue
-        train_list.append(line.rstrip('\n').rstrip('\r\n'))
-        if st >= train_time:
-            val_list.append(line.rstrip('\n').rstrip('\r\n'))
+        # 由于数据不全 所以需要校验数据的完整
+
+        if  time_data_iscomplete(line, config_dict):
+            if st >= train_time:
+                val_list.append(line.rstrip('\n').rstrip('\r\n'))
+            train_list.append(line.rstrip('\n').rstrip('\r\n'))
+
         st += datetime.timedelta(hours=3)
 
     print('加载数据完毕，一共有{}训练集，val{}测试集'.format(len(train_list), len(val_list)))
@@ -201,7 +193,6 @@ def init_old_data(config_dict,flag = False):
             tt += datetime.timedelta(hours=1)
         for dt in datetimelist:
             truthfilepath = os.path.join(config_dict['TruthFileDir'], dt.strftime('%Y'), dt.strftime('%Y_%m_%d') + '.txt')
-
             if not os.path.exists(truthfilepath):
                 print('Lighting data file `{}` not exist!'.format(truthfilepath))
                 continue

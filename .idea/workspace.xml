@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edb8f6b7-312a-4833-b472-dd6bd76cd294" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/light_train.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/light_train.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/TrainCase.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/TrainCase.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/ValCase.txt" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/ValCase.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre-eval/evaluation_eqdis/~$文档.docx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/config_train" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/config_train" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/pytorch_train/scores.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/pytorch_train/scores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre-eval/wjhTest/npyTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/wjhTest/npyTest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pre-eval/wjhTest/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/pre-eval/wjhTest/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -211,7 +207,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1649554666224</updated>
-      <workItem from="1650098336793" duration="3556000" />
+      <workItem from="1650098336793" duration="4836000" />
+      <workItem from="1650206666946" duration="545000" />
+      <workItem from="1650265867397" duration="2477000" />
     </task>
     <servers />
   </component>
@@ -250,20 +248,25 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pre-eval/wjhTest/test.py</url>
-          <line>55</line>
+          <line>86</line>
           <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pre-eval/pytorch_train/main.py</url>
+          <line>229</line>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/light_train$test.coverage" NAME="test Coverage Results" MODIFIED="1650101199897" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/wjhTest" />
+    <SUITE FILE_PATH="coverage/light_train$test.coverage" NAME="test Coverage Results" MODIFIED="1650266054209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/wjhTest" />
     <SUITE FILE_PATH="coverage/light_train$wjhTest.coverage" NAME="wjhTest Coverage Results" MODIFIED="1649430053556" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/pytorch_pre1.4" />
     <SUITE FILE_PATH="coverage/light_train$npyTest.coverage" NAME="npyTest Coverage Results" MODIFIED="1650100397774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/wjhTest" />
     <SUITE FILE_PATH="coverage/light_train$ncTest.coverage" NAME="ncTest Coverage Results" MODIFIED="1649153137928" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/wjhTest" />
     <SUITE FILE_PATH="coverage/light_train$NpyConvertNc.coverage" NAME="NpyConvertNc Coverage Results" MODIFIED="1649430034523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/pytorch_pre1.4" />
     <SUITE FILE_PATH="coverage/light_train$wenjiahuaTrueFiletoGrid.coverage" NAME="wenjiahuaTrueFiletoGrid Coverage Results" MODIFIED="1649521464252" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/evaluation_eqdis" />
     <SUITE FILE_PATH="coverage/light_train$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1650096095728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="/" />
-    <SUITE FILE_PATH="coverage/light_train$main.coverage" NAME="main Coverage Results" MODIFIED="1650101531241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/pytorch_train" />
+    <SUITE FILE_PATH="coverage/light_train$main.coverage" NAME="main Coverage Results" MODIFIED="1650268356411" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pre-eval/pytorch_train" />
   </component>
 </project>
