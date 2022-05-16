@@ -48,25 +48,36 @@ class Cal_params_neighbor(object):
         return fss
 
     def _POD_(self, n1, n3):
-        return np.true_divide(n1, n1 + n3 + self.eps)
+        if n1 == 0 and n3 == 0:
+            return 9999
+        return np.true_divide(n1, n1 + n3)
 
     def _FAR_(self, n1, n2):
-        return np.true_divide(n2, n1 + n2 + self.eps)
+        if n1 == 0 and n2 == 0:
+            return 9999
+        return np.true_divide(n2, n1 + n2)
 
     def _TS_(self, n1, n2, n3):
-        return np.true_divide(n1, n1 + n2 + n3 + self.eps)
+        if n1 == 0 and n2 == 0 and n3 == 0:
+            return 9999
+        return np.true_divide(n1, n1 + n2 + n3)
 
     def _ETS_(self, n1, n2, n3, n4):
         r = np.true_divide((n1 + n2) * (n1 + n3), n1 + n2 + n3 + n4 + self.eps)
         return np.true_divide(n1 - r, n1 + n2 + n3 - r + self.eps)
 
     def _FOM_(self, n1, n3):
+        if n1 == 0 and n3 ==0 :
+            return 9999
         return np.true_divide(n3, n1 + n3 + self.eps)
 
     def _BIAS_(self, n1, n2, n3):
+        if n1 == 0 and n2 == 0 and n3 ==0:
+            return 9999
         return np.true_divide(n1 + n2, n1 + n3 + self.eps)
 
     def _HSS_(self, n1, n2, n3, n4):
+
         return np.true_divide(2 * (n1 * n4 - n2 * n3), (n1 + n3) * (n3 + n4) + (n1 + n2) * (n2 + n4) + self.eps)
 
     def _PC_(self, n1, n2, n3, n4):

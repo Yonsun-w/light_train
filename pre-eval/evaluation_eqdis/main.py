@@ -58,7 +58,7 @@ def main(config_dict):
             print("config_dict['Threshold']", config_dict['Threshold'])
             for threshold in config_dict['Threshold']:
                 print("time = ",time," ptl = ",ptl ,"time_step",time_step,"threshold",threshold)
-                p = EvalData(true_file_grid, pre_file, pre_equal_distance, time, ptl, time_step, threshold)
+                p = EvalData(true_file_grid, pre_file, pre_equal_distance, time, ptl, time_step, threshold,)
 
                 for nbh in config_dict['NeighborhoodRange']:
                     # print('\nTime = {}  start&end = [{},{})  Threshold = {}  Neighborhood = {}'.

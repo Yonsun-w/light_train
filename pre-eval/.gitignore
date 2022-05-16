@@ -11,3 +11,8 @@
 *.npy
 *.nc
 /.idea
+/moeTest
+
+/*.pkl
+
+*.tar.gz

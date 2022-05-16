@@ -143,4 +143,8 @@ def time_data_iscomplete(time_str):
 
 if __name__ == '__main__':
 
-    path = '/data/wenjiahua/light_data/ADSNet_testdata/true_npy'
+    path = '/data/wenjiahua/light_data/ADSNet_testdata/merge_light_grid/201608201200_truth.npy'
+
+    a = np.load(path)
+
+    print(a.shape)

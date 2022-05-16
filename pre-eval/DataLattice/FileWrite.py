@@ -182,14 +182,14 @@ class TxtTrueFiletoGrid(object):
                 # 绘制到grid上
                 lat = lightning_data['lat']
                 lon = lightning_data['lon']
-                row = int(self._cal_distance(lat, lon, lat, self.lon_min) / self.lat_gap)
-                col = int(self._cal_distance(lat, lon, self.lat_min, lon) / self.lon_gap)
+                x = int(self._cal_distance(lat, lon, lat, self.lon_min) / self.lat_gap)
+                y = int(self._cal_distance(lat, lon, self.lat_min, lon) / self.lon_gap)
 
                 # 假如坐标越界，抛弃
-                if row >= self.row or col >= self.col:
+                if x >= self.row or y >= self.col:
                     return
 
-                cur_grid[row][col] += 1
+                cur_grid[x][y] += 1
 
         return cur_grid
 

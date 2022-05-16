@@ -7,10 +7,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import datetime
 from config import read_config
-from layers.ADSNet_model import ADSNet_Model
-from layers.LightNet_model import LightNet_Model
+from layers.ADSNet_model import ADSNet_Model as ads1
+from layers.moe_ADSNet import ADSNet_Model as ads2
+from layers.LightNet_model import LightNet_Model as l1
+from layers.moe_LightNet import LightNet_Model as l2
+
 from layers.OnlyObsNet_model import OnlyObsNet_Model
 from layers.OnlyWRFNet_model import OnlyWRFNet_Model
+from layers.MOE import MOE_Model
 from generator import DataGenerator
 from scores import Cal_params_epoch, Model_eval
 from generator import getTimePeriod
@@ -18,17 +22,22 @@ import datetime
 
 def selectModel(config_dict):
     if config_dict['NetName'] == 'ADSNet':
-        model = ADSNet_Model(obs_tra_frames=config_dict['TruthHistoryHourNum'], obs_channels=1, wrf_tra_frames=config_dict['ForecastHourNum'],
-                  wrf_channels=config_dict['WRFChannelNum'], config_dict=config_dict).to(config_dict['Device'])
+        model = ads2(obs_tra_frames=config_dict['TruthHistoryHourNum'], obs_channels=1, wrf_tra_frames=config_dict['ForecastHourNum'],
+                  wrf_channels=config_dict['WRFChannelNum'], row_col=config_dict['GridRowColNum']).to(config_dict['Device'])
     elif config_dict['NetName'] == 'LightNet':
-        model = LightNet_Model(obs_tra_frames=config_dict['TruthHistoryHourNum'], obs_channels=1, wrf_tra_frames=config_dict['ForecastHourNum'],
-                             wrf_channels=config_dict['WRFChannelNum'], config_dict=config_dict).to(config_dict['Device'])
+        model = l2(obs_tra_frames=config_dict['TruthHistoryHourNum'], obs_channels=1, wrf_tra_frames=config_dict['ForecastHourNum'],
+                             wrf_channels=config_dict['WRFChannelNum'], row_col=config_dict['GridRowColNum']).to(config_dict['Device'])
     elif config_dict['NetName'] == 'OnlyObs':
         model = OnlyObsNet_Model(obs_tra_frames=config_dict['TruthHistoryHourNum'], obs_channels=1,
                                pre_frames=config_dict['ForecastHourNum'], config_dict=config_dict).to(config_dict['Device'])
     elif config_dict['NetName'] == 'OnlyWRF':
         model = OnlyWRFNet_Model(wrf_tra_frames=config_dict['ForecastHourNum'],
                              wrf_channels=config_dict['WRFChannelNum'], config_dict=config_dict).to(config_dict['Device'])
+    elif config_dict['NetName'] == 'MOE':
+        model = MOE_Model(truth_history_hour_num=config_dict['TruthHistoryHourNum'],
+                forecast_hour_num=config_dict['ForecastHourNum'],
+                row_col=config_dict['GridRowColNum'], wrf_channels=config_dict['WRFChannelNum'],obs_channel = 1).to(config_dict['Device'])
+
     else:
         print('`{}` not support'.format(config_dict['NetName']))
         assert False
@@ -41,12 +50,6 @@ def time_data_iscomplete(time_str, config_dict):
     if time_str == '':
         return False
     is_complete = True
-    m = config_dict['GridRowColNum']
-    n = config_dict['GridRowColNum']
-    wrf_batch = np.zeros(shape=[config_dict['ForecastHourNum'], m, n, config_dict['WRFChannelNum']],
-                         dtype=np.float32)
-    label_batch = np.zeros(shape=[config_dict['ForecastHourNum'], m * n, 1], dtype=np.float32)
-    history_batch = np.zeros(shape=[config_dict['TruthHistoryHourNum'], m, n, 1], dtype=np.float32)
 
     ddt = datetime.datetime.strptime(time_str, '%Y%m%d%H%M')
     # read WRF
@@ -66,10 +69,11 @@ def time_data_iscomplete(time_str, config_dict):
         tFilePath = config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
         if not os.path.exists(tFilePath):
             is_complete = False
-        else :
+        else:
             a = np.load(tFilePath)
-            if np.sum(a) <= 10 :
-                False
+            if np.sum(a) <= 100:
+                is_complete = False
+
     # read history observations
     for hour_plus in range(config_dict['TruthHistoryHourNum']):
         dt = ddt + datetime.timedelta(hours=hour_plus - config_dict['TruthHistoryHourNum'])
@@ -80,41 +84,27 @@ def time_data_iscomplete(time_str, config_dict):
     return is_complete
 
 
+
+
+
+
 def DoTrain(config_dict):
-    # data index wjh改 我觉得没必要用读取txt的方式 为了便于我的开发 我这里直接将扫描开始的位置作为数据开始的时间
-    # TrainSetFilePath = 'TrainCase.txt'
-    # ValSetFilePath = 'ValCase.txt'
-    # train_list = []
-    # with open(TrainSetFilePath) as file:
-    #     for line in file:
-    #         # 由于数据不全 所以需要校验数据的完整
-    #         if time_data_iscomplete(line, config_dict):
-    #             train_list.append(line.rstrip('\n').rstrip('\r\n'))
-    # val_list = []
-    # with open(ValSetFilePath) as file:
-    #     for line in file:
-    #         # 由于数据不全 所以需要校验数据的完整
-    #         if time_data_iscomplete(line, config_dict):
-    #             val_list.append(line.rstrip('\n').rstrip('\r\n'))
-
-
     st = datetime.datetime.strptime(config_dict['ScanStartTime'], '%Y%m%d%H')
     et = datetime.datetime.strptime(config_dict['ScanEndTime'], '%Y%m%d%H')
-    # 训练集开始载入的时间
-    train_time = datetime.datetime.strptime('2020070200', '%Y%m%d%H')
+    # 验证集开始载入的时间
+    test_time = datetime.datetime.strptime(config_dict['testTime'], '%Y%m%d%H')
 
     train_list = []
     val_list = []
-    print('加载从{}到{}之间的数据集，其中{}时间到{}时间作为测试集'.format(st,et,train_time,et))
+    print('加载从{}到{}之间的数据集，其中{}时间到{}时间作为测试集'.format(st, et, test_time, et))
     while st <= et:
         line = datetime.datetime.strftime(st, '%Y%m%d%H%M')
         # 由于数据不全 所以需要校验数据的完整
-
-        if  time_data_iscomplete(line, config_dict):
-            if st >= train_time:
+        if time_data_iscomplete(line, config_dict):
+            if st >= test_time:
                 val_list.append(line.rstrip('\n').rstrip('\r\n'))
-            train_list.append(line.rstrip('\n').rstrip('\r\n'))
-
+            else:
+                train_list.append(line.rstrip('\n').rstrip('\r\n'))
         st += datetime.timedelta(hours=3)
 
     print('加载数据完毕，一共有{}训练集，val{}测试集'.format(len(train_list), len(val_list)))
@@ -127,13 +117,15 @@ def DoTrain(config_dict):
 
     # model
     model = selectModel(config_dict)
+    # for name, param in model.named_parameters():
+    #     if param.requires_grad:
+    #         print(name)
+
 
     # loss function
     criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor(16))
-
     # optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=config_dict['LearningRate'])
-
     # eval
     model_eval_valdata = Model_eval(config_dict)
 
@@ -141,6 +133,9 @@ def DoTrain(config_dict):
         # train_calparams_epoch = Cal_params_epoch()
         for i, (X, y) in enumerate(train_loader):
             wrf, obs, npyFilepath = X
+
+            # print('wrf.shape={},obs.shape={}'.format(wrf.shape, obs.shape))
+            # wrf.shape=torch.Size([4, 未来3小时, 159, 159, 29]),obs.shape=torch.Size([4, 历史6小时, 159, 159, 1])
             label = y
             wrf = wrf.to(config_dict['Device'])
 
@@ -148,8 +143,7 @@ def DoTrain(config_dict):
 
             label = label.to(config_dict['Device'])
 
-            pre_frames = model(wrf, obs)
-
+            pre_frames, h = model(wrf, obs)
 
             # backward
             optimizer.zero_grad()
@@ -160,7 +154,7 @@ def DoTrain(config_dict):
             optimizer.step()
 
             print('pre  有{}个, label  有{}个, obs 有{}个,wrf ={}, npyFilepath={}'.format(torch.sum(pre_frames>0), torch.sum(label>0)
-                  , torch.sum(obs>0),torch.sum(wrf>0), npyFilepath))
+                  , torch.sum(obs > 0), torch.sum(wrf > 0), npyFilepath))
 
             print('TRAIN INFO: epoch:{} ({}/{}) loss:{:.5f}'.format(epoch, i+1, len(train_loader), loss.item()))
             # pod, far, ts, ets = train_calparams_epoch.cal_batch(label, pre_frames)
@@ -235,6 +229,12 @@ if __name__ == "__main__":
 
     # #train
     DoTrain(config_dict)
+    # moedl = selectModel(config_dict)
 
+
+    # model = selectModel(config_dict)
+    #
+    # for name, param  in model.named_parameters():
+    #     print(name)
 
 

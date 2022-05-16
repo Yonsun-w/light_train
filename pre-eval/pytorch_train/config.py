@@ -40,6 +40,8 @@ def read_config():
                 config_info[key] = int(item[1])
             elif key == 'WRFChannelNum':
                 config_info[key] = int(item[1])
+            elif key == 'testTime':
+                config_info[key] = item[1]
             elif key == 'Device':
                 config_info[key] = item[1]
             else:

@@ -11,7 +11,7 @@ from scores import Cal_params_neighbor
 
 
 class EvalData(object):
-    def __init__(self, true_file_grid, pre_file, pre_equal_distance, time, pre_timelimit, time_step, threshold=0.5):
+    def __init__(self, true_file_grid, ground_file_path, pre_file, pre_equal_distance, time, pre_timelimit, time_step, threshold=0.5):
         self.threshold = threshold
 
         # #
@@ -26,29 +26,42 @@ class EvalData(object):
         #     self.x = struct.unpack('i', data[40:44])[0]
         #     self.y = struct.unpack('i', data[44:48])[0]
         # # print(self.lon_left, self.lat_top, self.lon_center, self.lat_center, self.lon_step, self.lat_step, self.x, self.y)
-        # #
+
 
         time = datetime.datetime.strptime(time, '%Y%m%d%H%M')
 
         time += datetime.timedelta(minutes=pre_timelimit[0])
         self.pre_data = np.zeros([159, 159])
+
+
         self.obs_data = np.zeros([149, 201])
+
         self.pre_data_dis = np.zeros([159, 159])
         for i in range(pre_timelimit[0] // time_step, pre_timelimit[1] // time_step):
 
             pre_path = os.path.join(pre_file, '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
 
             obs_path = os.path.join(true_file_grid, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
+
             pre_dis_path = os.path.join(pre_equal_distance, '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
             # self.pre_data += self._loadPreData_timestep(pre_path) #todo 这里为什么注解掉了？
 
             self.obs_data += self._loadObsData_timestep(obs_path)
+
             self.pre_data_dis += self._loadPredis_Data_timestep(pre_dis_path)
             time += datetime.timedelta(minutes=time_step)
         self.pre_data[self.pre_data > 1] = 1
         self.obs_data[self.obs_data > 1] = 1
         self.obs_data = self._disResize(self.obs_data)
         self.pre_data_dis[self.pre_data_dis > 1] = 1
+
+        ground_path = os.path(ground_file_path, 'adtd' + time.strftime('_%Y_%m_%d_%H_%M') + '.npy')
+
+        if not os.path.exists(ground_path):
+            print('{}时间内没有地闪数据引入观测'.format(ground_path))
+        else:
+            self.obs_data += np.load(ground_path)
+
 
         # show(self.pre_data)
         # show(self.obs_data)

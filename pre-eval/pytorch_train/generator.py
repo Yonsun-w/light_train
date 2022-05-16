@@ -101,7 +101,9 @@ def getHoursGridFromSmallNC_npy(filepath, delta_hour, config_dict):  # 20200619
             npy_grid = np.max(npy_grid, axis=1, keepdims=True)
         npy_grid = np.transpose(npy_grid, (0, 2, 3, 1))  # (12, 159, 159, x)
         grid_list.append(npy_grid)
+
     grid = np.concatenate(grid_list, axis=-1)
+    # grid.shape=(3, 159, 159, 29)
     return grid
 
 
@@ -195,8 +197,8 @@ class DataGenerator(py_Dataset):
             dt = ddt + datetime.timedelta(hours=hour_plus)
             tFilePath = self.config_dict['TruthFileDirGrid'] + dt.strftime('%Y%m%d%H%M') + '_truth' + '.npy'
             truth_grid = np.load(tFilePath)
-            # print('{}时间段内，发生了{}次闪电'.format(dt, np.sum(truth_grid>0)))
             truth_grid[truth_grid > 1] = 1
+            truth_grid = truth_grid.reshape(m * n)
             label_batch[hour_plus, :, :] = truth_grid[:, np.newaxis]
         # read history observations
         for hour_plus in range(self.config_dict['TruthHistoryHourNum']):
