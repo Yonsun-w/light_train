@@ -9,6 +9,7 @@ from generator import getTimePeriod
 
 
 
+
 def time_data_iscomplete(time_str, WRFFileDir, TruthFileDir):
     time_str = time_str.rstrip('\n')
     time_str = time_str.rstrip('\r\n')
