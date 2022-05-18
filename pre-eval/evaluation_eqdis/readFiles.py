@@ -33,7 +33,6 @@ class EvalData(object):
         time += datetime.timedelta(minutes=pre_timelimit[0])
         self.pre_data = np.zeros([159, 159])
 
-
         self.obs_data = np.zeros([149, 201])
 
         self.pre_data_dis = np.zeros([159, 159])
@@ -44,15 +43,21 @@ class EvalData(object):
             obs_path = os.path.join(true_file_grid, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
 
             pre_dis_path = os.path.join(pre_equal_distance, '{}_h{}.npy'.format(time.strftime('%Y%m%d%H%M'), i))
+
             # self.pre_data += self._loadPreData_timestep(pre_path) #todo 这里为什么注解掉了？
 
             self.obs_data += self._loadObsData_timestep(obs_path)
 
             self.pre_data_dis += self._loadPredis_Data_timestep(pre_dis_path)
+
             time += datetime.timedelta(minutes=time_step)
+
         self.pre_data[self.pre_data > 1] = 1
+
         self.obs_data[self.obs_data > 1] = 1
+
         self.obs_data = self._disResize(self.obs_data)
+
         self.pre_data_dis[self.pre_data_dis > 1] = 1
 
         ground_path = os.path(ground_file_path, 'adtd' + time.strftime('_%Y_%m_%d_%H_%M') + '.npy')

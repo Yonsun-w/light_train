@@ -233,20 +233,4 @@ if __name__ == "__main__":
     from config import read_config
     from torch.utils.data import DataLoader
     config_dict = read_config()
-    # data index
-    TrainSetFilePath = 'test_sta.txt'
-    train_list = []
-    with open(TrainSetFilePath) as file:
-        for line in file:
-            train_list.append(line.rstrip('\n').rstrip('\r\n'))
-    ##todo 这里是什么情况
-    train_data = DataGenerator(train_list, config_dict)
-    train_loader = DataLoader(dataset=train_data, batch_size=1, shuffle=True, num_workers=8)
-    for i, (X, y) in enumerate(train_loader):
-        wrf, obs = X
-        label = y
-        wrf = wrf.to(config_dict['Device'])
-        obs = obs.to(config_dict['Device'])
-        label = label.to(config_dict['Device'])
-        print(label.shape)
-        break
+

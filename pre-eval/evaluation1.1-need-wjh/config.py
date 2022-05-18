@@ -8,11 +8,11 @@ def read_config():
             line = line.rstrip('\r\n')
             item = line.split('=')
             key = item[0]
-            if key == 'preFile':
+            if key == 'FilePath':
                 config_info[key] = item[1]
-            elif key == 'TrueFileGrid':
+            elif key == 'GroundFilePath':
                 config_info[key] = item[1]
-            elif key == 'preEqualDistance':
+            elif key == 'PreFilePath':
                 config_info[key] = item[1]
             elif key == 'ObsFilePath':
                 config_info[key] = item[1]
@@ -47,16 +47,6 @@ def read_config():
                 for i in item[1].split(','):
                     tmp.append(i)
                 config_info[key] = tmp
-            elif key == 'lonBegin':
-                config_info[key] = item[1]
-            elif key == 'lonEnd':
-                config_info[key] = item[1]
-            elif key == 'latBegin':
-                config_info[key] = item[1]
-            elif key == 'latEnd':
-                config_info[key] = item[1]
-            elif key == 'groundFile':
-                config_info[key] = item[1]
             else:
                 print('no this item: {}'.format(key))
                 assert False
