@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: GBK -*-
 import numpy as np
 import datetime
 import os
@@ -13,42 +13,60 @@ class TxtTrueFiletoGrid(object):
         self.lat_min = float(config_dict['latBegin'])
         self.lon_max = float(config_dict['lonEnd'])
         self.lon_min = float(config_dict['lonBegin'])
-        # å•å…ƒæ ¼ä¸º m km * n km
-        # mä»£è¡¨ç»åº¦ä¸Šçš„å•å…ƒæ ¼ ä¹Ÿå°±æ˜¯ä¸€ä¸ªå•å…ƒæ ¼ ç»åº¦ä¸Šçš„kmæ•°
+        # µ¥Ôª¸ñÎª m km * n km
+        # m´ú±í¾­¶ÈÉÏµÄµ¥Ôª¸ñ Ò²¾ÍÊÇÒ»¸öµ¥Ôª¸ñ ¾­¶ÈÉÏµÄkmÊı
         self.lon_gap = config_dict['lonGap']
-        # nä»£è¡¨çº¬åº¦ä¸Šçš„
+        # n´ú±íÎ³¶ÈÉÏµÄ
         self.lat_gap = config_dict['latGap']
-        # è®¡ç®—æ¨ªç€çš„é•¿åº¦ ä¹Ÿå°±æ˜¯æ ¹æ®ç»åº¦è®¡ç®— ç”±äºä¸­å›½åœ¨ä¸ŠåŠçƒ æ‰€ä»¥æˆ‘ä»¬ç›´æ¥è®¡ç®—çº¬åº¦æœ€å¤§çš„é‚£éƒ¨åˆ†å°±å¥½ ä¹Ÿå°±æ˜¯ä¸‹è¾¹é‚£æ¡çº¿
+        # ¼ÆËãºá×ÅµÄ³¤¶È Ò²¾ÍÊÇ¸ù¾İ¾­¶È¼ÆËã ÓÉÓÚÖĞ¹úÔÚÉÏ°ëÇò ËùÒÔÎÒÃÇÖ±½Ó¼ÆËãÎ³¶È×î´óµÄÄÇ²¿·Ö¾ÍºÃ Ò²¾ÍÊÇÏÂ±ßÄÇÌõÏß
         distance_row = self._cal_distance(self.lat_max, self.lon_min, self.lat_max, self.lon_max)
-        # è®¡ç®—ç«–ç€çš„é•¿åº¦
+        # ¼ÆËãÊú×ÅµÄ³¤¶È
         distance_col = self._cal_distance(self.lat_min, self.lon_min, self.lat_max, self.lon_min)
-        # çŸ©é˜µçš„è¡Œ ä¸º
+        # ¾ØÕóµÄĞĞ Îª
         self.row = int(distance_row / self.lat_gap)
-        # çŸ©é˜µçš„åˆ—
+        # ¾ØÕóµÄÁĞ
         self.col = int(distance_col / self.lon_gap)
 
-        # è¿”å›çš„çŸ©é˜µ
-        self.grid = np.zeros(shape=[self.row, self.col], dtype=float)
+        # Èç¹ûÊÇµÈ¾­Î³¶È Ö±½ÓËã¾Í¿ÉÒÔÁË
+        if self.config_dict['equal_dis'] == 0:
+            self.lon_max = int(self.lon_max * 10000)
+            self.lon_min = int(self.lon_min * 10000)
+            self.lon_gap = int(self.lon_gap * 10000)
+            self.lat_gap = int(self.lat_gap * 10000)
+            self.lat_max = int(self.lat_max * 10000)
+            self.lat_min = int(self.lat_min * 10000)
+            self.row = int((self.lat_max - self.lat_min) / self.lat_gap)
+            self.col = int((self.lon_max - self.lon_min) / self.lon_gap)
+            self.lon_max = float(self.lon_max) / 10000
+            self.lon_min = float(self.lon_min) / 10000
+            self.lon_gap = float(self.lon_gap) / 10000
+            self.lat_gap = float(self.lat_gap) / 10000
+            self.lat_max = float(self.lat_max) / 10000
+            self.lat_min = float(self.lat_min) / 10000
 
-        # å¼€å§‹æ‰«æçš„æ—¶é—´æ®µ
+
+
+        # ·µ»ØµÄ¾ØÕó
+        self.grid = np.zeros(shape=[self.row, self.col], dtype=float)
+        # ¿ªÊ¼É¨ÃèµÄÊ±¼ä¶Î
         self.start_time = datetime.datetime.strptime(config_dict['startTime'], "%Y%m%d%H%M%S")
         self.end_time = datetime.datetime.strptime(config_dict['endTime'], "%Y%m%d%H%M%S")
 
-        # ä»£è¡¨æ—¶é—´çº¬åº¦ ç”¨äºncæ–‡ä»¶å­˜å‚¨ä¸Š
+        # ´ú±íÊ±¼äÎ³¶È ÓÃÓÚncÎÄ¼ş´æ´¢ÉÏ
         self.time = 0
-        # æ—¶é—´åˆ†è¾¨ç‡ å­˜å‚¨äº†æ¯ä¸ªè¦è¾“å‡ºçš„æ—¶é—´æ®µï¼Œæ¯ä¸ªæ—¶é—´æ®µå¯¹åº”ä¸€ä¸ªncæ–‡ä»¶
+        # Ê±¼ä·Ö±æÂÊ ´æ´¢ÁËÃ¿¸öÒªÊä³öµÄÊ±¼ä¶Î£¬Ã¿¸öÊ±¼ä¶Î¶ÔÓ¦Ò»¸öncÎÄ¼ş
         self.time_slot = []
         st = self.start_time
         while st <= self.end_time:
             self.time += 1
             self.time_slot.append(st)
-            # æ—¶é—´åˆ†è¾¨ç‡
+            # Ê±¼ä·Ö±æÂÊ
             st += datetime.timedelta(hours=config_dict['timeGap'])
 
 
         dataTime = self.start_time
-        # å­˜åœ¨çš„æ—¥æœŸæ–‡ä»¶åˆ—è¡¨ æ³¨æ„ è¿™é‡Œå­˜æ”¾çš„æ–‡ä»¶æ˜¯ä¸å¸¦çˆ¶ç›®å½•çš„ çˆ¶ç›®å½•ä¸º config_dict['TruthFileDir']
-        # è¿™é‡Œåªä¿å­˜æ—¥æœŸæ—¶é—´ ä¸ä¿ç•™å…·ä½“çš„å°æ—¶
+        # ´æÔÚµÄÈÕÆÚÎÄ¼şÁĞ±í ×¢Òâ ÕâÀï´æ·ÅµÄÎÄ¼şÊÇ²»´ø¸¸Ä¿Â¼µÄ ¸¸Ä¿Â¼Îª config_dict['TruthFileDir']
+        # ÕâÀïÖ»±£´æÈÕÆÚÊ±¼ä ²»±£Áô¾ßÌåµÄĞ¡Ê±
         self.txtFiles = []
         while (dataTime <= self.end_time):
             truthfilepath = self.config_dict['TruthFileDir'] + dataTime.strftime('%Y_%m_%d') + '.txt'
@@ -58,14 +76,18 @@ class TxtTrueFiletoGrid(object):
                 self.txtFiles.append(dataTime.strftime('%Y_%m_%d') + '.txt')
             dataTime += datetime.timedelta(days=1)
 
-        if not os.path.isdir(self.config_dict['output']):
-            print('æ‚¨çš„ncæ–‡ä»¶è¾“å‡ºç›®å½•æŒ‡å®šä¸å­˜åœ¨ï¼Œè¯·æ£€æŸ¥')
+
+
+
+        if not os.path.isdir(self.config_dict['outputFileDir']):
+            print('ÄúµÄncÎÄ¼şÊä³öÄ¿Â¼Ö¸¶¨²»´æÔÚ£¬Çë¼ì²é')
 
         if not os.path.isdir(self.config_dict['TruthFileDir']):
-            print('æ‚¨çš„txtæ–‡ä»¶è¾“å…¥ç›®å½•æŒ‡å®šä¸å­˜åœ¨ï¼Œè¯·æ£€æŸ¥')
+            print('ÄúµÄtxtÎÄ¼şÊäÈëÄ¿Â¼Ö¸¶¨²»´æÔÚ£¬Çë¼ì²é')
 
 
-        print('-----txtæ•°æ®æ ¼ç‚¹åŒ–æ–‡ä»¶åˆå§‹åŒ–å®Œæ¯•ï¼Œç­‰å¾…å†™å…¥ä¸­----------')
+        print('-----txtÊı¾İ¸ñµã»¯ÎÄ¼ş³õÊ¼»¯Íê±Ï, ÕâĞ©ÎÄ¼ş¿ÉÓÃ={}£¬µÈ´ıĞ´ÈëÖĞ----------'.format(self.txtFiles))
+
 
 
 
@@ -81,124 +103,139 @@ class TxtTrueFiletoGrid(object):
                 np.sin((radLng1 - radLng2) / 2.0), 2))) * ER
         return d
 
-    # å°†æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰çš„txtè®°å½•æ•°æ®è½¬æ¢ä¸ºncæ•°æ®æ ¼å¼
+    # ½«ÎÄ¼ş¼ĞÏÂËùÓĞµÄtxt¼ÇÂ¼Êı¾İ×ª»»ÎªncÊı¾İ¸ñÊ½
     def all_trueFile_txt_to_wrf(self):
-        print('-----------------å¼€å§‹è¾“å‡ºnc--------------')
-        # è·å–æ¯ä¸ªæ—¶é—´æ®µ
+        print('-----------------¿ªÊ¼Êä³önc--------------')
+        # »ñÈ¡Ã¿¸öÊ±¼ä¶Î
         for time in self.time_slot:
             truthfilepath = self.config_dict['TruthFileDir'] + time.strftime('%Y_%m_%d') + '.txt'
-
             if not os.path.exists(truthfilepath):
-                print('Lighting data file  `{}` not exist! (è¿™ä¸ªæ–‡ä»¶ä¸å­˜åœ¨ {})'.format(truthfilepath, truthfilepath))
                 continue
             output_file =os.path.join(self.config_dict['outputFileDir'], time.strftime('%Y_%m_%d_%H_%M') + '.nc')
             self.create_nc(output_file,truthfilepath, time)
-            print('æ‚¨å¥½ï¼Œæ‚¨çš„txtæ–‡ä»¶={},å·²ç»è½¬åŒ–ä¸ºæ ¼ç‚¹åŒ–æ•°æ®ï¼Œè¾“å‡ºä¸º={},è¯·æ‚¨æŸ¥çœ‹,'.format(truthfilepath,output_file))
-        print('------------------ncæ–‡ä»¶è¾“å‡ºå®Œæ¯•----------------------')
+        print('ÄúºÃ£¬ÄúµÄtxtÎÄ¼ş={},ÒÑ¾­×ª»¯Îª¸ñµã»¯Êı¾İ'.format(truthfilepath))
+        print('------------------ncÎÄ¼şÊä³öÍê±Ï----------------------')
 
-    # å°†æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰çš„txtè®°å½•æ•°æ®è½¬æ¢ä¸ºnpyæ•°æ®æ ¼å¼
+    # ½«ÎÄ¼ş¼ĞÏÂËùÓĞµÄtxt¼ÇÂ¼Êı¾İ×ª»»ÎªnpyÊı¾İ¸ñÊ½
     def all_trueFile_txt_to_npy(self):
-        print('-----------------å¼€å§‹è¾“å‡ºnpz--------------')
-
-        # è·å–æ¯ä¸ªæ—¶é—´æ®µ
+        print('-----------------¿ªÊ¼Êä³önpz--------------')
+        # »ñÈ¡Ã¿¸öÊ±¼ä¶Î
         for time in self.time_slot:
             truthfilepath = self.config_dict['TruthFileDir'] + time.strftime('%Y_%m_%d') + '.txt'
-
             if not os.path.exists(truthfilepath):
-                print('Lighting data file  `{}` not exist! (è¿™ä¸ªæ–‡ä»¶ä¸å­˜åœ¨ {})'.format(truthfilepath, truthfilepath))
+                # print('Lighting data file  `{}` not exist! (Õâ¸öÎÄ¼ş²»´æÔÚ {})'.format(truthfilepath, truthfilepath))
                 continue
             output_file = os.path.join(self.config_dict['outputFileDir'],time.strftime('%Y_%m_%d_%H_%M') + '.npy')
             grid = self.txt_to_grid(truthfilepath,time)
 
+            if (np.sum(grid>0)) :
+                print('{},ÓĞ{}'.format(output_file, np.sum(grid)))
             np.save(output_file, grid)
-            print('{}è¾“å‡ºæˆåŠŸï¼Œè¯·æ‚¨æŸ¥çœ‹'.format(output_file))
 
-        print('-----------------npzè¾“å‡ºå®Œæ¯•--------------')
+        print('ÄúºÃ£¬ÄúµÄtxtÎÄ¼ş={},ÒÑ¾­×ª»¯Îª¸ñµã»¯Êı¾İ'.format(truthfilepath))
+
+        print('-----------------npzÊä³öÍê±Ï--------------')
 
 
 
 
-    # ä¸‰ä¸ªå‚æ•° åˆ†åˆ«æ˜¯ è¾“å‡ºæ–‡ä»¶å¤¹,è¯»å–çš„txtæ–‡ä»¶,å’Œtimeå½“å‰æ—¶é—´æ®µ
+    # Èı¸ö²ÎÊı ·Ö±ğÊÇ Êä³öÎÄ¼ş¼Ğ,¶ÁÈ¡µÄtxtÎÄ¼ş,ºÍtimeµ±Ç°Ê±¼ä¶Î
     def create_nc(self, output_path, txt_path, time):
-        f_w = nc.Dataset(output_path, 'w', format='NETCDF4')  # åˆ›å»ºä¸€ä¸ªæ ¼å¼ä¸º.ncçš„
-        f_w.FileOrigins = 'equidistant'
+        f_w = nc.Dataset(output_path, 'w', format='NETCDF4')  # ´´½¨Ò»¸ö¸ñÊ½Îª.ncµÄ
+        if self.config_dict['equal_dis'] == 1:
+            f_w.FileOrigins = 'equidistant'
+            lon_lat_Gap = '{}km'.format(self.config_dict['latGap'])
+            f_w.delta_dis = lon_lat_Gap
+        else :
+            f_w.FileOrigins = 'equal_latlon'
+            # ÕâÀïµÈ¾­Î³¶È µÈ¾àÀë²»ÖªµÀÔõÃ´Ğ´
+            f_w.delta_lat = self.config_dict['latGap']
+            f_w.delta_lon = self.config_dict['lonGap']
+
         f_w.lon_begin = self.lon_min
         f_w.lon_end = self.lon_max
         f_w.lat_begin = self.lat_min
         f_w.lat_end = self.lat_max
-        # è¿™é‡Œç­‰ç»çº¬åº¦ ç­‰è·ç¦»ä¸çŸ¥é“æ€ä¹ˆå†™
-        f_w.delta_lat = 0.03
-        f_w.delta_dis = '4km'
-        # è¿™é‡Œè®¾ç½®çš„æ˜¯æ—¶é—´åˆ†è¾¨ç‡
-        f_w.delta_time = self.config_dict['timeGap']
-        # --------------------ä¸Šè¿°æ˜¯å†™å…¥å¤´æ–‡ä»¶-----------------------------
 
-        # ç¡®å®šåŸºç¡€å˜é‡çš„ç»´åº¦ä¿¡æ¯ã€‚ç›¸å¯¹ä¸åæ ‡ç³»çš„å„ä¸ªè½´(x,y,z)
+        time_gap = int(self.config_dict['timeGap'])
+
+        # ÕâÀïÉèÖÃµÄÊÇÊ±¼ä·Ö±æÂÊ
+        f_w.delta_time = time_gap
+        # --------------------ÉÏÊöÊÇĞ´ÈëÍ·ÎÄ¼ş-----------------------------
+        # È·¶¨»ù´¡±äÁ¿µÄÎ¬¶ÈĞÅÏ¢¡£Ïà¶ÔÓë×ø±êÏµµÄ¸÷¸öÖá(x,y,z)
         f_w.createDimension('south_north', self.row)
         f_w.createDimension('west_east', self.col)
-
-        # todo è¿™ä¸ªå‚æ•°å¥½åƒæ²¡ç”¨äº†  æš‚æ—¶æ³¨é‡Šäº†
-        # f_w.createDimension('Time', self.time)
-        # f_w.createVariable('Flash_pre', np.float32, ('Time', 'south_north', 'west_east'))
-
         f_w.createVariable('Flash_pre', np.float32, ('south_north', 'west_east'))
         f_w.variables['Flash_pre'].MemoryOrder = 'XY'
         f_w.variables['Flash_pre'].units = 'BJTime'
         f_w.variables['Flash_pre'].description = 'hourly grid prediction lightning'
         f_w.variables['Flash_pre'].coordinates = 'XLONG XLAT'
-        # --------------------ä¸Šè¿°æ˜¯åˆ›å»ºå˜é‡ä¿¡æ¯-----------------------------
 
-        # è·å–è¯¥æ—¶é—´æ®µä¸‹çš„çŸ©é˜µæ•°æ® ä¹Ÿå°±æ˜¯è¯¥æ—¶é—´åˆ†è¾¨ç‡ä¸‹çš„æ ¼ç‚¹æ•°æ®
+        cur_time = datetime.datetime.strftime(time, "%Y%m%d%H%M%S")
+        data = datetime.datetime.strptime(cur_time, "%Y%m%d%H%M%S")
+        start = datetime.datetime.strftime(data, "%Y%m%d_%H%M%S")
+        data = data + datetime.timedelta(hours=time_gap)
+        end = datetime.datetime.strftime(data, "%Y%m%d_%H%M%S")
+        f_w.variables['Flash_pre'].FillValue = 1e+20
+        f_w.variables['Flash_pre'].init_time = start
+        f_w.variables['Flash_pre'].valid_time = end
+        # --------------------ÉÏÊöÊÇ´´½¨±äÁ¿ĞÅÏ¢-----------------------------x
+        # »ñÈ¡¸ÃÊ±¼ä¶ÎÏÂµÄ¾ØÕóÊı¾İ Ò²¾ÍÊÇ¸ÃÊ±¼ä·Ö±æÂÊÏÂµÄ¸ñµãÊı¾İ
         cur_grid = self.txt_to_grid(txt_path, time)
-        f_w.variables['Flash_pre'] = cur_grid
-        # å…³é—­æ–‡ä»¶
+        f_w.variables['Flash_pre'][:] = cur_grid
+        # ¹Ø±ÕÎÄ¼ş
         f_w.close()
 
 
-
-    # æ•°æ®è½¬åŒ–ä¸ºçŸ©é˜µ å°†t1æ—¶é—´æ®µå†…çš„é—ªç”µæ ¼ç‚¹åŒ–
+    # Êı¾İ×ª»¯Îª¾ØÕó ½«t1Ê±¼ä¶ÎÄÚµÄÉÁµç¸ñµã»¯
     def txt_to_grid(self, tFilePath, t1):
-        # å½“å‰æ—¶é—´æ®µçš„çŸ©é˜µ æœ€å¤šä¸º1 ä»–çš„å½¢çŠ¶å’Œgridæ˜¯ä¸€æ ·çš„
+        # µ±Ç°Ê±¼ä¶ÎµÄ¾ØÕó ×î¶àÎª1 ËûµÄĞÎ×´ºÍgridÊÇÒ»ÑùµÄ
         cur_grid = np.zeros(shape=[self.row, self.col], dtype=int)
         t2 = t1 + datetime.timedelta(hours=self.config_dict['timeGap'])
+
+
+        #todo del
         with open(tFilePath, 'r', encoding='GBK') as tfile:
             for line in tfile:
-                # æ¯æ¡é—ªç”µæ•°æ®
+                # Ã¿ÌõÉÁµçÊı¾İ
                 lightning_data = {}
                 linedata = line.split()
                 temp_date = linedata[1]
                 temp_time = linedata[2]
                 temp_dt = datetime.datetime.strptime(temp_date + ' ' + temp_time[0:8], "%Y-%m-%d %H:%M:%S")
                 lightning_data['data'] = temp_dt
-                lightning_data['lat'] = float(linedata[3].lstrip('çº¬åº¦='))
-                lightning_data['lon'] = float(linedata[4].lstrip('ç»åº¦='))
-                # å‡å¦‚æ—¶é—´ä¸åœ¨è¿™ä¸ªèŒƒå›´å†… ç›´æ¥è·³è¿‡
+                lightning_data['lat'] = float(linedata[3].lstrip('Î³¶È='))
+                lightning_data['lon'] = float(linedata[4].lstrip('¾­¶È='))
                 if not t1 <= temp_dt <= t2:
                     continue
-                # å¦‚æœä¸åœ¨èŒƒå›´å†… åˆ™ä¸ç»˜åˆ¶ï¼Œå¦åˆ™ ç»˜åˆ¶
+                # Èç¹û²»ÔÚ·¶Î§ÄÚ Ôò²»»æÖÆ£¬·ñÔò »æÖÆ
                 if not self.check_in_area(lightning_data):
-                   #print('ä¸ç»˜åˆ¶', lightning_data)
                     continue
-                # ç»˜åˆ¶åˆ°gridä¸Š
+                # »æÖÆµ½gridÉÏ
                 lat = lightning_data['lat']
                 lon = lightning_data['lon']
                 x = int(self._cal_distance(lat, lon, lat, self.lon_min) / self.lat_gap)
                 y = int(self._cal_distance(lat, lon, self.lat_min, lon) / self.lon_gap)
 
-                # å‡å¦‚åæ ‡è¶Šç•Œï¼ŒæŠ›å¼ƒ
+                # Èç¹ûÊÇµÈ¾­Î³¶È Ö±½ÓËã
+                if self.config_dict['equal_dis'] == 0:
+                    y = int((lon - self.lon_min) / self.lat_gap)
+                    x = int((lat - self.lat_min) / self.lon_gap)
+
+
+                # ¼ÙÈç×ø±êÔ½½ç£¬Å×Æú
                 if x >= self.row or y >= self.col:
-                    return
+                    continue
 
                 cur_grid[x][y] += 1
 
         return cur_grid
 
 
-    # æ£€æµ‹è¯¥ç‚¹æ˜¯å¦åœ¨èŒƒå›´å‘¢
+    # ¼ì²â¸ÃµãÊÇ·ñÔÚ·¶Î§ÄØ
     def check_in_area(self, linedata):
         la = float(linedata['lat'])
         lo = float(linedata['lon'])
-        datetime = linedata['data']
         if lo < self.lon_min or lo > self.lon_max or la < self.lat_min or la > self.lat_max:
             return False
 
@@ -206,6 +243,5 @@ class TxtTrueFiletoGrid(object):
 
 
 if __name__ == "__main__":
-    config = config.read_config()
-    t = TxtTrueFiletoGrid(config)
-    t.all_trueFile_txt_to_wrf()
+    nc_path = 'TrueNc/2021_07_11_04_00.nc'
+    f_w = nc.Dataset(nc_path, 'r', format='NETCDF4')  # ´´½¨Ò»¸ö¸ñÊ½Îª.ncµÄ

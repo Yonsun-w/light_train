@@ -8,10 +8,18 @@ def read_config():
             line = line.rstrip('\r\n')
             item = line.split('=')
             key = item[0]
-            if key == 'FilePath':
+            if key == 'type':
+                config_info[key] = int(item[1])
+            elif key == 'TrueFileGrid':
                 config_info[key] = item[1]
+            elif key == 'preFile':
+                config_info[key] = item[1]
+            elif key == 'NeedObs':
+                config_info[key] = int(item[1])
             elif key == 'GroundFilePath':
                 config_info[key] = item[1]
+            elif key == 'NeedGround':
+                config_info[key] = int(item[1])
             elif key == 'PreFilePath':
                 config_info[key] = item[1]
             elif key == 'ObsFilePath':

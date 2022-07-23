@@ -24,8 +24,9 @@ def read_config():
                 config_info[key] = float(item[1])
             elif key == 'TruthFileDir':
                 config_info[key] = item[1]
-            elif key == 'lonGap':
-                config_info[key] = float(item[1])
+            elif key == 'lon_lat_Gap':
+                config_info['latGap'] = float(item[1])
+                config_info['lonGap'] = float(item[1])
             elif key == 'latGap':
                 config_info[key] = float(item[1])
             elif key == 'Threshold':
@@ -34,6 +35,14 @@ def read_config():
                 config_info[key] = int(item[1])
             elif key == 'output':
                 config_info[key] = item[1]
+            elif key == 'npy':
+                config_info[key] = int(item[1])
+            elif key == 'nc':
+                config_info[key] = int(item[1])
+            elif key == 'saveImage':
+                config_info[key] = int(item[1])
+            elif key == 'equal_dis':
+                config_info[key] = int(item[1])
             else:
                 print('no this item: {}'.format(key))
                 assert False

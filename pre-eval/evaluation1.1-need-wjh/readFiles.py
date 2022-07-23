@@ -6,9 +6,9 @@ import struct
 from scores import Cal_params_neighbor
 
 class EvalData(object):
-    def __init__(self, path, time, pre_timelimit, time_step, threshold=0.5):
+    def __init__(self, pre_path, obs_path, ground_path, need_ground, need_obs, time, pre_timelimit, time_step, threshold=0.5):
         self.threshold = threshold
-        with open(os.path.join(path, 'pre', '{}_h0.dat'.format(time)), 'rb') as f:
+        with open(os.path.join(pre_path, '{}_h0.dat'.format(time)), 'rb') as f:
             data = f.read()
             self.lon_left = struct.unpack('f', data[16:20])[0]
             self.lat_top = struct.unpack('f', data[20:24])[0]
@@ -25,11 +25,23 @@ class EvalData(object):
         self.pre_data = np.zeros([self.y, self.x])
         self.obs_data = np.zeros([self.y, self.x])
         for i in range(pre_timelimit[0] // time_step, pre_timelimit[1] // time_step):
-            pre_path = os.path.join(path, 'pre', '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
-            obs_path = os.path.join(path, 'obs', 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
-            self.pre_data += self._loadPreData_timestep(pre_path)
-            self.obs_data += self._loadObsData_timestep(obs_path)
+            p_path = os.path.join(pre_path, '{}_h{}.dat'.format(time.strftime('%Y%m%d%H%M'), i))
+            o_path = os.path.join(obs_path, 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
+            self.pre_data += self._loadPreData_timestep(p_path)
+
+            # 算上真实数据
+            if need_obs == 1:
+                self.obs_data += self._loadObsData_timestep(o_path)
+            # 算上地闪数据
+            if need_ground == 1:
+                g_path = os.path.join(ground_path, 'obs', 'RealDF{}_60.DAT'.format(time.strftime('%Y%m%d%H%M')))
+                self.obs_data += np.load(g_path)
+
             time += datetime.timedelta(minutes=time_step)
+
+
+
+
         self.pre_data[self.pre_data > 1] = 1
         self.obs_data[self.obs_data > 1] = 1
         # show(self.obs_data)
